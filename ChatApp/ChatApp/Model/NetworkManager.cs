@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MyDemo.Model
+namespace ChatApp.Model
 {
     internal class NetworkManager
     {

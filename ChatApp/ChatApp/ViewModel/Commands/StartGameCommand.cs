@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using MyDemo.ViewModel;
+using ChatApp.ViewModel;
 
-namespace MyDemo.ViewModel.Command
+namespace ChatApp.ViewModel.Command
 {
     internal class StartGameCommand : ICommand
     {
