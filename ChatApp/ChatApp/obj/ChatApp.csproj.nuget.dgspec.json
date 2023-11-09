@@ -1,23 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\sahsa74\\source\\repos\\ChatApp\\ChatApp\\ChatApp.csproj": {}
+    "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj": {}
   },
   "projects": {
-    "C:\\Users\\sahsa74\\source\\repos\\ChatApp\\ChatApp\\ChatApp.csproj": {
+    "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\sahsa74\\source\\repos\\ChatApp\\ChatApp\\ChatApp.csproj",
+        "projectUniqueName": "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj",
         "projectName": "ChatApp",
-        "projectPath": "C:\\Users\\sahsa74\\source\\repos\\ChatApp\\ChatApp\\ChatApp.csproj",
-        "packagesPath": "C:\\Users\\sahsa74\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\sahsa74\\source\\repos\\ChatApp\\ChatApp\\obj\\",
+        "projectPath": "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj",
+        "packagesPath": "C:\\Users\\gieal640\\.nuget\\packages\\",
+        "outputPath": "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\sahsa74\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\gieal640\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -54,7 +55,15 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.402\\RuntimeIdentifierGraph.json"
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     }
