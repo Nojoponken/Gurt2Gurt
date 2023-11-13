@@ -5,9 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChatApp.View"
         mc:Ignorable="d"
-        Title="ConnectScreen" Width="700" Height="800" >
-    <Grid Style="{DynamicResource GridStyle}" Margin="30,30,30,30">
-        <TextBox Margin="0,0,0,0" TextWrapping="Wrap" Text="TextBox"  HorizontalAlignment="Center" VerticalAlignment="Center" Width="300" Height="30"/>
-        <Label Content="IP" Margin="90,147,420,147" Width="30" Height="30" />
-    </Grid>
+        Title="ConnectScreen" Width="800" Height="600" Background="#FF69B962" >
+    <StackPanel
+        Orientation="Vertical"
+        Grid.IsSharedSizeScope="True"
+        VerticalAlignment="Center">
+        
+        <Label Content="Port:" Width="300" Height="30" Foreground="White" FontSize="14" FontFamily="Comic Sans MS" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <TextBox Text="{Binding Path=ListenPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextWrapping="Wrap" Width="300" Height="30"/>
+        <Button Content="Start Server" Width="300" Height="30" Margin="0, 10"/>
+
+
+        <StackPanel Orientation="Horizontal" Width="300">
+        <StackPanel>
+                <Label Content="IP:" Width="200" Height="30" Foreground="White" FontSize="14" FontFamily="Comic Sans MS" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                <TextBox Text="{Binding Path=ConnectionIP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextWrapping="Wrap"  Height="30"/>
+        </StackPanel>
+        <StackPanel Margin="10, 0, 0, 0">
+                <Label Content="Port:" Width="90" Height="30" Foreground="White" FontSize="14" FontFamily="Comic Sans MS" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                <TextBox Text="{Binding Path=ConnectionPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextWrapping="Wrap" Height="30"/>
+        </StackPanel>
+        </StackPanel>
+
+        <Button Command="{Binding StartServer}" Content="Start Client" Width="300" Height="30" Margin="0, 10, 0, 0"/>
+
+    </StackPanel>
+
 </Window>

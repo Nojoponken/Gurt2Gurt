@@ -18,14 +18,12 @@ namespace ChatApp.Model
             System.Diagnostics.Debug.WriteLine("Starting a connection...");
             System.Diagnostics.Debug.WriteLine("Connection established!");
             return true;
-
         }
 
 
         public void sendMessage(string str)
         {
-            System.Diagnostics.Debug.WriteLine(str + " is sent!");
-            
+            System.Diagnostics.Debug.WriteLine(str + " is sent!"); 
         }
     }
 }

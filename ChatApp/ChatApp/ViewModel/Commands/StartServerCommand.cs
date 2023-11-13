@@ -4,19 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using ChatApp.ViewModel;
 
-namespace ChatApp.ViewModel.Command
+namespace ChatApp.ViewModel.Commands
 {
-    internal class StartGameCommand : ICommand
+    internal class StartServerCommand : ICommand
     {
-        private MainWindowViewModel parent = null;
+        private ConnectScreenViewModel parent;
 
-
-        public StartGameCommand(MainWindowViewModel parent)
+        public StartServerCommand (ConnectScreenViewModel parent)
         {
             this.parent = parent;
-
         }
 
         public event EventHandler? CanExecuteChanged;
@@ -28,8 +25,7 @@ namespace ChatApp.ViewModel.Command
 
         public void Execute(object parameter)
         {
-
-            parent.showGameBoard();
+            parent.startConnection();
         }
     }
 }

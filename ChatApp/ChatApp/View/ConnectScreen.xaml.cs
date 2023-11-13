@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ChatApp.Model;
+using ChatApp.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,11 +24,11 @@ namespace ChatApp.View
         public ConnectScreen()
         {
             InitializeComponent();
+            this.DataContext = new ConnectScreenViewModel(new NetworkManager());
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-
         }
     }
 }
