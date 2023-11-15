@@ -1,10 +1,12 @@
 ﻿using ChatApp.Model;
+using ChatApp.View;
 using ChatApp.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace ChatApp.ViewModel
@@ -14,6 +16,7 @@ namespace ChatApp.ViewModel
         private NetworkManager _networkManager;
 
         private ICommand _startServer;
+        private ICommand _startClient;
 
         private string _connectionIP;
         private string _connectionPort;
@@ -30,6 +33,19 @@ namespace ChatApp.ViewModel
             set
             {
                 _startServer = value;
+            }
+        }
+
+        public ICommand StartClient
+        {
+            get
+            {
+                _startClient ??= new StartClientCommand(this);
+                return _startClient;
+            }
+            set
+            {
+                _startClient = value;
             }
         }
 
@@ -59,6 +75,8 @@ namespace ChatApp.ViewModel
         public void startConnection()
         {
             _networkManager.startConnection();
+            ChatScreen chatscreen = new ChatScreen();
+            chatscreen.Show();
         }
 
     }

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "X:\\Documents\\tddd49\\ChatApp\\ChatApp\\ChatApp.csproj": {}
+    "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj": {}
   },
   "projects": {
-    "X:\\Documents\\tddd49\\ChatApp\\ChatApp\\ChatApp.csproj": {
+    "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "X:\\Documents\\tddd49\\ChatApp\\ChatApp\\ChatApp.csproj",
+        "projectUniqueName": "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj",
         "projectName": "ChatApp",
-        "projectPath": "X:\\Documents\\tddd49\\ChatApp\\ChatApp\\ChatApp.csproj",
-        "packagesPath": "C:\\Users\\noali443\\.nuget\\packages\\",
-        "outputPath": "X:\\Documents\\tddd49\\ChatApp\\ChatApp\\obj\\",
+        "projectPath": "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\ChatApp.csproj",
+        "packagesPath": "C:\\Users\\gieal640\\.nuget\\packages\\",
+        "outputPath": "X:\\Desktop\\TDDD49\\ChatApp\\ChatApp\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\noali443\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\gieal640\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -62,7 +62,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.404\\RuntimeIdentifierGraph.json"
         }
       }
     }
