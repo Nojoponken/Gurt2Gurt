@@ -872,4 +872,5 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/```
 
-ChatApp/ChatApp/obj
+ChatApp/ChatApp/obj/*
+ChatApp/ChatApp/bin/*
