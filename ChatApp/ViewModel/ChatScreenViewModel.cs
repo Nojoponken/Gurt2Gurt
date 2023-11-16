@@ -3,7 +3,9 @@ using ChatApp.View;
 using ChatApp.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,13 +13,24 @@ using System.Windows.Input;
 
 namespace ChatApp.ViewModel
 {
-    class ChatScreenViewModel
+    class ChatScreenViewModel : INotifyPropertyChanged
     {
         private readonly NetworkManager networkManager;
 
         private ICommand sendMessage;
 
         private History messageHistory;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
 
         public ICommand SendMessage
         {
@@ -45,6 +58,7 @@ namespace ChatApp.ViewModel
         public void AddHistory(Message message)
         {
             messageHistory.AddMessage(message);
+            NotifyPropertyChanged(nameof(MessageHistory));
         }
     }
 }

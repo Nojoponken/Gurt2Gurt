@@ -31,7 +31,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <ListBox Grid.Row="0" 
-                ItemsSource="{Binding MessageHistory}"
+                ItemsSource="{Binding MessageHistory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemTemplate="{StaticResource messageTemplate}"/>
             <Button Grid.Row="1" Command="{Binding SendMessage}" Content="Send"/>
         </Grid>
