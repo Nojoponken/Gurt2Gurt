@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatApp.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,11 +8,11 @@ using System.Windows.Input;
 
 namespace ChatApp.ViewModel.Commands
 {
-    internal class StartClientCommand : ICommand
+    internal class SendMessageCommand : ICommand
     {
-        private readonly ConnectScreenViewModel parent;
+        private readonly ChatScreenViewModel parent;
 
-        public StartClientCommand(ConnectScreenViewModel parent)
+        public SendMessageCommand(ChatScreenViewModel parent)
         {
             this.parent = parent;
         }
@@ -25,7 +26,7 @@ namespace ChatApp.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            ConnectScreenViewModel.StartConnection();
+            parent.AddHistory(new Message("In the beninging", "J. Doe"));
         }
     }
 }

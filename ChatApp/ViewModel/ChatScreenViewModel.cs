@@ -13,11 +13,38 @@ namespace ChatApp.ViewModel
 {
     class ChatScreenViewModel
     {
-        private NetworkManager _networkManager;
-           
-        public ChatScreenViewModel(NetworkManager networkManager) 
-        { 
-            this._networkManager = networkManager; 
+        private readonly NetworkManager networkManager;
+
+        private ICommand sendMessage;
+
+        private History messageHistory;
+
+        public ICommand SendMessage
+        {
+            get
+            {
+                sendMessage ??= new SendMessageCommand(this);
+                return sendMessage;
+            }
+
+            set { sendMessage = value; }
+        }
+
+        public Message[] MessageHistory => messageHistory.Messages;
+
+        public ChatScreenViewModel(NetworkManager networkManager)
+        {
+            this.networkManager = networkManager;
+            this.messageHistory = new History();
+
+            this.sendMessage = new SendMessageCommand(this);
+
+            this.messageHistory.AddMessage(new Message("yo", "bro"));
+        }
+
+        public void AddHistory(Message message)
+        {
+            messageHistory.AddMessage(message);
         }
     }
 }

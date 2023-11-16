@@ -9,23 +9,23 @@ namespace ChatApp.ViewModel.Commands
 {
     internal class StartServerCommand : ICommand
     {
-        private ConnectScreenViewModel parent;
+        private readonly ConnectScreenViewModel parent;
 
-        public StartServerCommand (ConnectScreenViewModel parent)
+        public StartServerCommand(ConnectScreenViewModel parent)
         {
             this.parent = parent;
         }
 
         public event EventHandler? CanExecuteChanged;
 
-        public bool CanExecute(object parameter)
+        public bool CanExecute(object? parameter)
         {
             return true;
         }
 
-        public void Execute(object parameter)
+        public void Execute(object? parameter)
         {
-            parent.startConnection();
+            ConnectScreenViewModel.StartConnection();
         }
     }
 }

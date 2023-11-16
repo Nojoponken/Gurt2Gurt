@@ -13,69 +13,68 @@ namespace ChatApp.ViewModel
 {
     class ConnectScreenViewModel
     {
-        private NetworkManager _networkManager;
+        private NetworkManager networkManager;
 
-        private ICommand _startServer;
-        private ICommand _startClient;
+        private ICommand startServer;
+        private ICommand startClient;
 
-        private string _connectionIP;
-        private string _connectionPort;
-        private string _listenPort;
+        private string connectionIP;
+        private string connectionPort;
+        private string listenPort;
 
 
         public ICommand StartServer
         {
             get
             {
-                _startServer ??= new StartServerCommand(this);
-                return _startServer;
+                startServer ??= new StartServerCommand(this);
+                return startServer;
             }
-            set
-            {
-                _startServer = value;
-            }
+            set { startServer = value; }
         }
 
         public ICommand StartClient
         {
             get
             {
-                _startClient ??= new StartClientCommand(this);
-                return _startClient;
+                startClient ??= new StartClientCommand(this);
+                return startClient;
             }
-            set
-            {
-                _startClient = value;
-            }
+            set { startClient = value; }
         }
 
-        public string ConnectionIP { 
-            get { return _connectionIP; } 
-            set { _connectionIP = value; } 
+        public string ConnectionIP
+        {
+            get { return connectionIP; }
+            set { connectionIP = value; }
         }
 
         public string ConnectionPort
         {
-            get { return _connectionPort; }
-            set { _connectionPort = value; }
+            get { return connectionPort; }
+            set { connectionPort = value; }
         }
         public string ListenPort
         {
-            get { return _listenPort; }
-            set { _listenPort = value; }
+            get { return listenPort; }
+            set { listenPort = value; }
         }
 
-        public ConnectScreenViewModel(NetworkManager networkManager) {
-            this._networkManager = networkManager;
-            this._listenPort = string.Empty;
-            this._connectionIP = string.Empty;
-            this._connectionPort = string.Empty;
-        }
-
-        public void startConnection()
+        public ConnectScreenViewModel(NetworkManager networkManager)
         {
-            _networkManager.startConnection();
-            ChatScreen chatscreen = new ChatScreen();
+            this.networkManager = networkManager;
+            this.listenPort = string.Empty;
+            this.connectionIP = string.Empty;
+            this.connectionPort = string.Empty;
+
+            this.startServer = new StartServerCommand(this);
+            this.startClient = new StartClientCommand(this);
+        }
+
+        public static void StartConnection()
+        {
+            NetworkManager.StartConnection();
+            ChatScreen chatscreen = new();
             chatscreen.Show();
         }
 

@@ -6,6 +6,13 @@
         xmlns:local="clr-namespace:ChatApp.View"
         mc:Ignorable="d"
         Title="ChatScreen" Height="450" Width="800">
+    <Window.Resources>
+        <DataTemplate x:Key="messageTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding Content}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
@@ -18,10 +25,15 @@
             <Button Content="Jean Doe"/>
             <Button Content="June Doe"/>
         </StackPanel>
-        <StackPanel Orientation="Vertical" Grid.Column="1">
-            <TextBlock Text="lol, gibba?"/>
-            <TextBlock Text="lol, gibba?"/>
-            <TextBlock Text="lol, gibba?"/>
-        </StackPanel>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <ListBox Grid.Row="0" 
+                ItemsSource="{Binding MessageHistory}"
+                ItemTemplate="{StaticResource messageTemplate}"/>
+            <Button Grid.Row="1" Command="{Binding SendMessage}" Content="Send"/>
+        </Grid>
     </Grid>
 </Window>

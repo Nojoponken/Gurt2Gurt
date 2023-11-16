@@ -13,7 +13,7 @@ namespace ChatApp.Model
     internal class NetworkManager
     {
 
-        public bool startConnection()
+        public static bool StartConnection()
         {
             System.Diagnostics.Debug.WriteLine("Starting a connection...");
             System.Diagnostics.Debug.WriteLine("Connection established!");
@@ -21,9 +21,9 @@ namespace ChatApp.Model
         }
 
 
-        public void sendMessage(string str)
+        public void SendMessage(string str)
         {
-            System.Diagnostics.Debug.WriteLine(str + " is sent!"); 
+            System.Diagnostics.Debug.WriteLine(str + " is sent!");
         }
     }
 }
