@@ -21,17 +21,6 @@ namespace ChatApp.ViewModel
 
         private History messageHistory;
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-
         public ICommand SendMessage
         {
             get
@@ -43,7 +32,28 @@ namespace ChatApp.ViewModel
             set { sendMessage = value; }
         }
 
-        public Message[] MessageHistory => messageHistory.Messages;
+        public Message[] MessageHistory
+        {
+            get
+            {
+                return messageHistory.Messages;
+            }
+            set
+            {
+                messageHistory.AddMessage(value[0]);
+                OnPropertyChanged("MessageHistory");
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public ChatScreenViewModel(NetworkManager networkManager)
         {
@@ -58,7 +68,6 @@ namespace ChatApp.ViewModel
         public void AddHistory(Message message)
         {
             messageHistory.AddMessage(message);
-            NotifyPropertyChanged(nameof(MessageHistory));
         }
     }
 }

@@ -22,6 +22,8 @@ namespace ChatApp.Model
         public void AddMessage(Message messageToAdd)
         {
             _ = messages.Append(messageToAdd);
+            System.Diagnostics.Debug.WriteLine(messageToAdd.Content);
+
         }
     }
 }

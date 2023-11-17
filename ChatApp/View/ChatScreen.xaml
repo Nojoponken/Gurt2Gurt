@@ -9,7 +9,7 @@
     <Window.Resources>
         <DataTemplate x:Key="messageTemplate">
             <StackPanel>
-                <TextBlock Text="{Binding Content}"/>
+                <TextBlock Text="{Binding Path=Content}"/>
             </StackPanel>
         </DataTemplate>
     </Window.Resources>
@@ -31,7 +31,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <ListBox Grid.Row="0" 
-                ItemsSource="{Binding MessageHistory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                ItemsSource="{Binding Path=MessageHistory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                 ItemTemplate="{StaticResource messageTemplate}"/>
             <Button Grid.Row="1" Command="{Binding SendMessage}" Content="Send"/>
         </Grid>
