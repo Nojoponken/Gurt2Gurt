@@ -4,6 +4,7 @@ using ChatApp.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -71,12 +72,18 @@ namespace ChatApp.ViewModel
             this.startClient = new StartClientCommand(this);
         }
 
-        public static void StartConnection()
+        public void StartConnection()
         {
-            NetworkManager.StartConnection();
+            Task.Run(() => NetworkManager.StartConnection(Int32.Parse(listenPort)));
             ChatScreen chatscreen = new();
             chatscreen.Show();
         }
 
+        internal void FindConnection()
+        {
+            Task.Run(() => NetworkManager.FindConnection(connectionIP, Int32.Parse(connectionPort)));
+            ChatScreen chatscreen = new();
+            chatscreen.Show();
+        }
     }
 }

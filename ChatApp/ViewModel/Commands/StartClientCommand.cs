@@ -25,7 +25,7 @@ namespace ChatApp.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            ConnectScreenViewModel.StartConnection();
+            parent.FindConnection();
         }
     }
 }
