@@ -64,9 +64,9 @@ namespace ChatApp.ViewModel
         public ConnectScreenViewModel(NetworkManager networkManager)
         {
             this.networkManager = networkManager;
-            this.listenPort = string.Empty;
-            this.connectionIP = string.Empty;
-            this.connectionPort = string.Empty;
+            this.listenPort = "3000";
+            this.connectionIP = "127.0.0.1";
+            this.connectionPort = "3000";
 
             this.startServer = new StartServerCommand(this);
             this.startClient = new StartClientCommand(this);

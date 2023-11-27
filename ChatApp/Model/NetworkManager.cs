@@ -36,27 +36,27 @@ namespace ChatApp.Model
                 data = data.ToUpper();
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
                 stream.Write(msg, 0, msg.Length);
-                System.Diagnostics.Debug.WriteLine("I StartConnection: ", data);
+                System.Diagnostics.Debug.WriteLine($"Started Connection, message: {data}");
             }
             return true;
         }
 
         public static bool FindConnection(string adress, Int32 port) {
-            String message = "WASSAAAAAAAAAAH";
+            String message = "WAZZAAAAAAAAAA!";
             using TcpClient client = new TcpClient(adress, port);
 
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
             NetworkStream stream = client.GetStream();
             stream.Write(data, 0, data.Length);
-            System.Diagnostics.Debug.WriteLine("I FindConnection: ", message);
-
+            System.Diagnostics.Debug.WriteLine($"Found Connection, message: {message}");
+            
             return true;
         }
 
 
         public void SendMessage(string str)
         {
-            System.Diagnostics.Debug.WriteLine(str + " is sent!");
+             System.Diagnostics.Debug.WriteLine(str + " is sent!");
         }
     }
 }
