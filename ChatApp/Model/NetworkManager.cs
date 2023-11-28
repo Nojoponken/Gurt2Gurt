@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace ChatApp.Model
 {
@@ -38,11 +39,21 @@ namespace ChatApp.Model
                 stream.Write(msg, 0, msg.Length);
                 System.Diagnostics.Debug.WriteLine($"Started Connection, message: {data}");
             }
+
+            while (true)
+            {
+                if(!client.Connected)
+                {
+                    server.Stop();
+                    Window.ContextMenuClosingEvent*()
+                    break;
+                }
+            }
             return true;
         }
 
         public static bool FindConnection(string adress, Int32 port) {
-            String message = "WAZZAAAAAAAAAA!";
+            String message = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!";
             using TcpClient client = new TcpClient(adress, port);
 
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
@@ -50,6 +61,10 @@ namespace ChatApp.Model
             stream.Write(data, 0, data.Length);
             System.Diagnostics.Debug.WriteLine($"Found Connection, message: {message}");
             
+            while (true)
+            {
+                
+            }
             return true;
         }
 
