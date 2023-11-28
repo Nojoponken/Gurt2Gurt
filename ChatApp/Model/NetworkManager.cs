@@ -27,6 +27,7 @@ namespace ChatApp.Model
             using TcpClient client = server.AcceptTcpClient();
             System.Diagnostics.Debug.WriteLine("Connection established!");
 
+                   
             NetworkStream stream = client.GetStream();
             Byte[] bytes = new byte[256];
             String data = null;
@@ -39,32 +40,22 @@ namespace ChatApp.Model
                 stream.Write(msg, 0, msg.Length);
                 System.Diagnostics.Debug.WriteLine($"Started Connection, message: {data}");
             }
-
-            while (true)
-            {
-                if(!client.Connected)
-                {
-                    server.Stop();
-                    Window.ContextMenuClosingEvent*()
-                    break;
-                }
-            }
+            MessageBox.Show("serveer off");
             return true;
         }
 
         public static bool FindConnection(string adress, Int32 port) {
-            String message = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA!";
+            String message = "in your walls ";
             using TcpClient client = new TcpClient(adress, port);
-
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
-            NetworkStream stream = client.GetStream();
-            stream.Write(data, 0, data.Length);
-            System.Diagnostics.Debug.WriteLine($"Found Connection, message: {message}");
-            
             while (true)
             {
-                
+                Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+                NetworkStream stream = client.GetStream();
+                stream.Write(data, 0, data.Length);
             }
+            System.Diagnostics.Debug.WriteLine($"Found Connection, message: {message}");
+
+            MessageBox.Show("client off");
             return true;
         }
 
