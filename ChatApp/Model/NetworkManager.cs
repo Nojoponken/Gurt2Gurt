@@ -34,6 +34,7 @@ namespace ChatApp.Model
             int i;
             while((i = stream.Read(bytes, 0, bytes.Length)) != 0)
             {
+
                 data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                 data = data.ToUpper();
                 byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
