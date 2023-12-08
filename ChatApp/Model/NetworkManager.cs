@@ -45,11 +45,6 @@ namespace ChatApp.Model
             return true;
         }
 
-        //       _/_/_/ _/  _/    _/_/_/   _/      _/    _/    _/  _/
-        //      _/      _/_/     _/     _/  _/  _/  _/  _/_/  _/  _/
-        //     _/_/     _/      _/_/   _/_/_/  _/_/_/  _/  _/_/   
-        //    _/       _/      _/     _/  _/  _/  _/  _/    _/  _/
-
         public static bool FindConnection(string adress, Int32 port) {
             String message = "in your walls ";
             using TcpClient client = new TcpClient(adress, port);
