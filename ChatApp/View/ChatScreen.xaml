@@ -8,6 +8,16 @@
         Title="ChatScreen" Height="450" Width="800">
     <Window.Resources>
         <viewmodel:ChatScreenViewModel x:Key="m" ></viewmodel:ChatScreenViewModel>
+        <DataTemplate x:Key="msg">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0" Text="{Binding Path=Content}"/>
+                <TextBox Grid.Row="1" Text="{Binding Path=Author}"/>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -27,7 +37,7 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <ListBox Grid.Row="0" 
-                ItemsSource="{Binding Path=MessageHistory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
+                ItemsSource="{Binding Path=MessageHistory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ItemTemplate="{StaticResource msg}"/>
             <Button Grid.Row="1" Command="{Binding SendMessage}" Content="Send"/>
         </Grid>
     </Grid>

@@ -3,6 +3,7 @@ using ChatApp.View;
 using ChatApp.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -17,9 +18,11 @@ namespace ChatApp.ViewModel
     {
         private readonly NetworkManager networkManager;
 
+        public event PropertyChangedEventHandler? PropertyChanged;
+        
         private ICommand sendMessage;
 
-        private List<Message> messageHistory;
+        private ObservableCollection<Message> messageHistory;
 
         public ICommand SendMessage
         {
@@ -32,7 +35,7 @@ namespace ChatApp.ViewModel
             set { sendMessage = value; }
         }
 
-        public List<Message> MessageHistory
+        public ObservableCollection<Message> MessageHistory
         {
             get
             {
@@ -40,25 +43,11 @@ namespace ChatApp.ViewModel
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged([CallerMemberName]  String propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
 
         public ChatScreenViewModel(NetworkManager networkManager)
         {
             this.networkManager = networkManager;
-            this.messageHistory = new List<Message>();
+            this.messageHistory = new ObservableCollection<Message>();
 
             this.sendMessage = new SendMessageCommand(this);
         }
@@ -67,7 +56,7 @@ namespace ChatApp.ViewModel
         {
             this.messageHistory.Add(new Message("yo", "john"));
             System.Diagnostics.Debug.WriteLine($"{messageHistory[0]}");
-            NotifyPropertyChanged();
+            PropertyChanged.Invoke(this, new(nameof(MessageHistory)));
         }
     }
 }
