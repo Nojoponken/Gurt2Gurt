@@ -43,6 +43,12 @@ namespace ChatApp.ViewModel
             }
         }
 
+        public ChatScreenViewModel()
+        {
+            this.messageHistory = new ObservableCollection<Message>();
+
+            this.sendMessage = new SendMessageCommand(this);
+        }
 
         public ChatScreenViewModel(NetworkManager networkManager)
         {

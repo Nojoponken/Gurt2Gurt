@@ -24,7 +24,7 @@ namespace ChatApp.View
         public Accept()
         {
             InitializeComponent();
-            this.DataContext = new ChatScreenViewModel(new NetworkManager());
+            this.DataContext = new ChatScreenViewModel(new ServerManager());
         }
     }
 }

@@ -24,7 +24,7 @@ namespace ChatApp.View
         public ConnectScreen()
         {
             InitializeComponent();
-            this.DataContext = new ConnectScreenViewModel(new NetworkManager());
+            this.DataContext = new ConnectScreenViewModel();
         }
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)

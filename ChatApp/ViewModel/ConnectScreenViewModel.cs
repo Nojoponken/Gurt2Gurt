@@ -14,8 +14,6 @@ namespace ChatApp.ViewModel
 {
     class ConnectScreenViewModel
     {
-        private NetworkManager networkManager;
-
         private ICommand startServer;
         private ICommand startClient;
 
@@ -61,9 +59,8 @@ namespace ChatApp.ViewModel
             set { listenPort = value; }
         }
 
-        public ConnectScreenViewModel(NetworkManager networkManager)
+        public ConnectScreenViewModel()
         {
-            this.networkManager = networkManager;
             this.listenPort = "3000";
             this.connectionIP = "127.0.0.1";
             this.connectionPort = "3000";
@@ -74,15 +71,19 @@ namespace ChatApp.ViewModel
 
         public void StartConnection()
         {
-            Task.Run(() => NetworkManager.StartConnection(Int32.Parse(listenPort)));
             ChatScreen chatscreen = new();
+            var server = new ServerManager();
+            Task.Run(() => server.StartConnection("127.0.0.1", int.Parse(listenPort)));
+            chatscreen.DataContext = new ChatScreenViewModel(server);
             chatscreen.Show();
         }
 
         internal void FindConnection()
         {
-            Task.Run(() => NetworkManager.FindConnection(connectionIP, Int32.Parse(connectionPort)));
             ChatScreen chatscreen = new();
+            var client = new ClientManager();
+            Task.Run(() => client.StartConnection(connectionIP, int.Parse(connectionPort)));
+            chatscreen.DataContext = new ChatScreenViewModel(client);
             chatscreen.Show();
         }
     }
