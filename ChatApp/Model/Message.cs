@@ -13,9 +13,9 @@ namespace ChatApp.Model
         private string author;
         private string type;
 
-        public string Content { get;  set; }
-        public string Author { get; set; }
-        public string Type { get; set; }
+        public string Content { get { return content; } set { content = value; } }
+        public string Author { get { return author; } set { author = value; } }
+        public string Type { get { return type; } set { type = value; } }
 
         public Message(string content, string author, string type)
         {

@@ -14,12 +14,16 @@ namespace ChatApp.Model
 {
     class NetworkManager
     {
+
         private IPAddress address;
         private Int32 port;
 
         private bool pending;
         private string want_connect;
         private TcpListener server;
+        private NetworkStream stream;
+
+        public event EventHandler<string>? PendingClient;
 
         public string WantConnect { set { want_connect = value; } }
         public bool Pending { get { return pending; } }
@@ -43,33 +47,34 @@ namespace ChatApp.Model
             System.Diagnostics.Debug.WriteLine("Connection established!");
 
 
-            NetworkStream stream = client.GetStream();
-            StreamReader reader = new(stream);
-            StreamWriter writer = new(stream);
 
+            stream = client.GetStream();
             while (true)
             {
-                string data = reader.ReadLine();
+                byte[] recieve_buffer = new byte[1024];
+                int data = stream.Read(recieve_buffer, 0, 1024);
                 if (data != null)
                 {
-                    Message message = JsonSerializer.Deserialize<Message>(data);
+                    System.Diagnostics.Debug.WriteLine("INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE");
+
+                    string recieved = Encoding.UTF8.GetString(recieve_buffer, 0, data);
+                    Message message = JsonSerializer.Deserialize<Message>(recieved);
+                    PendingClient?.Invoke(this, message.Author);
+
                     while (true)
                     {
                         if (want_connect == "accept")
                         {
                             Message response = new("ACCEPT", "John", "system");
                             string json_string = JsonSerializer.Serialize(response);
-                            writer.Write(json_string);
+                            // TODO : grabb grej du vet
                             break;
                         }
                         if (want_connect == "deny")
                         {
                             Message response = new("DENY", "John", "system");
                             string json_string = JsonSerializer.Serialize(response);
-                            writer.Write(json_string);
-
-                            reader.Close();
-                            writer.Close();
+                            /// TODO: send respsodfa
                             client.Close();
                             break;
                         }
@@ -85,39 +90,43 @@ namespace ChatApp.Model
             using TcpClient client = new(adress, port);
 
             // Make stream reader/writer
-            NetworkStream stream = client.GetStream();
-            StreamReader reader = new(stream);
-            StreamWriter writer = new(stream);
-
+            stream = client.GetStream();
+            
             Message message = new("REQUEST", "John", "system");
             string json_string = JsonSerializer.Serialize(message);
 
-            writer.WriteLine(json_string);
 
-            System.Diagnostics.Debug.WriteLine($"Found Connection, message: {message}");
+            byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
+            stream.Write(send_buffer, 0, json_string.Length);
+
+
+
             while (true)
             {
-                string data = reader.ReadLine();
+                byte[] recieve_buffer = new byte[1024];
+                int data = stream.Read(recieve_buffer, 0, 1024);
                 if (data != null)
                 {
-                    Message response_message = JsonSerializer.Deserialize<Message>(data);
+                    string response = Encoding.UTF8.GetString(recieve_buffer, 0, data);
+                    Message response_message = JsonSerializer.Deserialize<Message>(response);
+
+                    System.Diagnostics.Debug.WriteLine($"Found Connection, message: {response}");
                     if (response_message.Type == "system")
                     {
                         if (response_message.Content == "ACCEPT")
                         {
                             MessageBox.Show("success");
+                            return true;
                         }
                         else if (response_message.Content == "DENY")
                         {
-                            reader.Close();
-                            writer.Close();
                             client.Close();
+                            MessageBox.Show("client off");
+                            return true;
                         }
                     }
                 }
             }
-            MessageBox.Show("client off");
-            return true;
         }
     }
 }
