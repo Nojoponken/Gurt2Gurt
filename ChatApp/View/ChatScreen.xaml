@@ -24,13 +24,23 @@
             <ColumnDefinition Width="200" />
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Orientation="Vertical" Grid.Column="0">
-            <Button Content="John Doe"/>
-            <Button Content="Jane Doe"/>
-            <Button Content="Jim Doe"/>
-            <Button Content="Jean Doe"/>
-            <Button Content="June Doe"/>
-        </StackPanel>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Vertical">
+                <Button Content="John Doe"/>
+                <Button Content="Jane Doe"/>
+                <Button Content="Jim Doe"/>
+                <Button Content="Jean Doe"/>
+                <Button Content="June Doe"/>
+            </StackPanel>
+            <DockPanel Grid.Row="1" Visibility="{Binding Path=PendingConnect}">
+                <Button Width="100" Content="Accept"/>
+                <Button Content="Deny"/>
+            </DockPanel>
+        </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>

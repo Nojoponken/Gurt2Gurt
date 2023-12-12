@@ -26,7 +26,7 @@ namespace ChatApp.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            parent.AddHistory(new Message("In the beninging", "J. Doe"));
+            parent.AddHistory(new Message("In the beninging", "J. Doe", "user"));
         }
     }
 }

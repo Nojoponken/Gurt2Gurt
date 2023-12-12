@@ -43,6 +43,18 @@ namespace ChatApp.ViewModel
             }
         }
 
+        public string PendingConnect
+        {
+            get
+            {
+                if (networkManager.Pending)
+                {
+                    return "Visible";
+                }
+                return "Hidden";
+            }
+        } 
+
         public ChatScreenViewModel()
         {
             this.messageHistory = new ObservableCollection<Message>();
@@ -50,7 +62,7 @@ namespace ChatApp.ViewModel
             this.sendMessage = new SendMessageCommand(this);
         }
 
-        public ChatScreenViewModel(NetworkManager networkManager)
+        public ChatScreenViewModel(ref NetworkManager networkManager)
         {
             this.networkManager = networkManager;
             this.messageHistory = new ObservableCollection<Message>();
@@ -60,7 +72,7 @@ namespace ChatApp.ViewModel
 
         public void AddHistory(Message message)
         {
-            this.messageHistory.Add(new Message("yo", "john"));
+            this.messageHistory.Add(new Message("yo", "john", "user"));
             System.Diagnostics.Debug.WriteLine($"{messageHistory[0]}");
             PropertyChanged.Invoke(this, new(nameof(MessageHistory)));
         }

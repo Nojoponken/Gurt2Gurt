@@ -11,14 +11,17 @@ namespace ChatApp.Model
     {
         private string content;
         private string author;
+        private string type;
 
-        public string Content { get { return content; } set { content = value; } }
-        public string Author { get { return author; } set { author = value; } }
+        public string Content { get;  set; }
+        public string Author { get; set; }
+        public string Type { get; set; }
 
-        public Message(string content, string author)
+        public Message(string content, string author, string type)
         {
             this.content = content;
             this.author = author;
+            this.type = type;
         }
     }
 }
