@@ -34,9 +34,8 @@ namespace ChatApp.ViewModel
         private string disconnectVisibility;
         private string status;
         private string statusColor;
+        private string connected;
 
-        private bool pending;
-        private bool connected;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -101,8 +100,7 @@ namespace ChatApp.ViewModel
         public string DisconnectVisibility { get { return disconnectVisibility; } set { disconnectVisibility = value; OnPropertyChanged(); } }
         public string Status { get { return status; } set { status = value; OnPropertyChanged(); } }
         public string StatusColor { get { return statusColor; } set { statusColor = value; OnPropertyChanged(); } }
-        public bool Pending { get { return pending; } set { pending = value; OnPropertyChanged(); } }
-        public bool Connected { get { return connected; } set { connected = value; OnPropertyChanged(); } }
+        public string Connected { get { return connected; } set { connected = value; OnPropertyChanged(); } }
 
         public ChatScreenViewModel() { }
 
@@ -112,10 +110,10 @@ namespace ChatApp.ViewModel
             this.networkManager = networkManager;
             this.username = networkManager.Username;
             this.messageHistory = new ObservableCollection<Message>();
+            this.messageContent = "";
             this.pendingVisibility = "Hidden";
             this.disconnectVisibility = "Hidden";
-            this.pending = false;
-            this.connected = false;
+            this.connected = "False";
             this.status = "Listening for connection...";
             this.statusColor = Gray;
 
@@ -145,7 +143,7 @@ namespace ChatApp.ViewModel
             Status = "Disconnected";
             StatusColor = Red;
             DisconnectVisibility = "Hidden";
-            Connected = false;
+            Connected = "False";
         }
 
         public void DisconnectChat()
@@ -155,7 +153,10 @@ namespace ChatApp.ViewModel
 
         public void Send()
         {
-            networkManager.SendMessage(MessageContent);
+            if (messageContent.Length > 0)
+            {
+                networkManager.SendMessage(MessageContent);
+            }
         }
 
         public void DeclineIncoming()
@@ -198,7 +199,6 @@ namespace ChatApp.ViewModel
             StatusColor = Blue;
 
             PendingVisibility = "Visible";
-            Pending = true;
         }
 
         private void OnAcceptClient(object? sender, string user)
@@ -209,9 +209,8 @@ namespace ChatApp.ViewModel
             StatusColor = Green;
 
             PendingVisibility = "Hidden";
-            Pending = false;
             DisconnectVisibility = "Visible";
-            connected = true;
+            Connected = "True";
         }
 
 
@@ -223,7 +222,6 @@ namespace ChatApp.ViewModel
             StatusColor = Gray;
 
             PendingVisibility = "Hidden";
-            Pending = false;
         }
 
         private void OnIsClient(object? sender, EventArgs empty)

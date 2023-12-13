@@ -59,7 +59,7 @@
             </ScrollViewer>
             <DockPanel Grid.Row="1">
                 <TextBox Width="500" Text="{Binding Path=MessageContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Command="{Binding SendMessage}" Content="Send"/>
+                <Button Command="{Binding SendMessage}" IsEnabled="{Binding Connected}" Content="Send"/>
             </DockPanel>
         </Grid>
     </Grid>
