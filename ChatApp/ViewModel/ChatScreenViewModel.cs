@@ -107,6 +107,22 @@ namespace ChatApp.ViewModel
 
             networkManager.MessageRecieved += OnMessageRecieved;
             networkManager.MessageSent += OnMessageSent;
+
+            networkManager.Disconnected += OnDisconnected;
+            userWindow.Closed += OnClosing;
+
+        }
+
+        public void OnClosing(object? sender, EventArgs eventArgs)
+        {
+            System.Diagnostics.Debug.WriteLine($"lmao");
+
+        }
+
+        public void OnDisconnected(object? sender, EventArgs eventArgs)
+        {
+            Status = "Disconnected";
+            StatusColor = Red;
         }
 
         public void Send()
@@ -123,6 +139,8 @@ namespace ChatApp.ViewModel
         {
             networkManager.WantConnect = "accept";
         }
+
+
 
         public void OnMessageRecieved(object? sender, Message message)
         {

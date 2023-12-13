@@ -9,6 +9,7 @@ using System.Windows;
 using System.Globalization;
 using System.Text.Json;
 using System.IO;
+using System.Reflection.Metadata;
 
 namespace ChatApp.Model
 {
@@ -25,6 +26,7 @@ namespace ChatApp.Model
 
         public event EventHandler? IsClient;
         public event EventHandler? CloseClient;
+        public event EventHandler? Disconnected;
 
         public event EventHandler<string>? PendingClient;
         public event EventHandler<string>? AcceptClient;
@@ -173,6 +175,9 @@ namespace ChatApp.Model
                     }
                     else if (message.Type == "system" && message.Content == "DISCONNECT")
                     {
+                        client.Close();
+                        server.Stop();
+                        Disconnected.Invoke(this, EventArgs.Empty);
                         break;
                     }
                 }
@@ -192,6 +197,25 @@ namespace ChatApp.Model
                 stream.Write(send_buffer, 0, json_string.Length);
                 MessageSent?.Invoke(this, message);
             }
+
+            return true;
+        }
+
+        public bool Disconnect() 
+        {
+            Message message = new("DISCONNECT", username, "system");
+            string json_string = JsonSerializer.Serialize(message);
+
+            byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
+            if (stream != null)
+            {
+                stream.Write(send_buffer, 0, json_string.Length);
+                MessageSent?.Invoke(this, message);
+            }
+
+            client.Close();
+            server.Stop();
+            Disconnected.Invoke(this, EventArgs.Empty);
 
             return true;
         }
