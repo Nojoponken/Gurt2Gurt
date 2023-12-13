@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.RightsManagement;
 using System.Text;
@@ -28,10 +29,14 @@ namespace ChatApp.ViewModel
         // Fields
         private readonly NetworkManager networkManager;
         private ObservableCollection<Message> messageHistory;
+        private bool isClient;
+        private string ip;
+        private string port;
         private string messageContent;
         private string username;
         private string pendingVisibility;
         private string disconnectVisibility;
+        private string restartServerVisibility;
         private string status;
         private string statusColor;
         private string connected;
@@ -53,6 +58,7 @@ namespace ChatApp.ViewModel
         private ICommand denyRequest;
         private ICommand acceptRequest;
         private ICommand disconnect;
+        private ICommand restartServer;
 
         public ICommand SendMessage
         {
@@ -90,6 +96,16 @@ namespace ChatApp.ViewModel
             }
             set { disconnect = value; }
         }
+        
+        public ICommand RestartServer
+        {
+            get
+            {
+                restartServer ??= new RestartServerCommand(this);
+                return restartServer;
+            }
+            set { restartServer = value; }
+        }
 
 
         public ObservableCollection<Message> MessageHistory { get { return messageHistory; } }
@@ -98,9 +114,15 @@ namespace ChatApp.ViewModel
         public string Username { get { return username; } set { username = value; OnPropertyChanged(); } }
         public string PendingVisibility { get { return pendingVisibility; } set { pendingVisibility = value; OnPropertyChanged(); } }
         public string DisconnectVisibility { get { return disconnectVisibility; } set { disconnectVisibility = value; OnPropertyChanged(); } }
+        public string RestartServerVisibility { get { return restartServerVisibility; } set { restartServerVisibility = value; OnPropertyChanged(); } }
+
         public string Status { get { return status; } set { status = value; OnPropertyChanged(); } }
         public string StatusColor { get { return statusColor; } set { statusColor = value; OnPropertyChanged(); } }
         public string Connected { get { return connected; } set { connected = value; OnPropertyChanged(); } }
+        public string IP { get { return ip; } set { ip = value; OnPropertyChanged(); } }
+
+        public string Port { get { return port; } set { port = value; OnPropertyChanged(); } }
+
 
         public ChatScreenViewModel() { }
 
@@ -108,23 +130,29 @@ namespace ChatApp.ViewModel
         {
             userWindow = window;
             this.networkManager = networkManager;
+            this.isClient = false;
             this.username = networkManager.Username;
+            this.IP = networkManager.IP;
+            this.Port = networkManager.Port;
+            
             this.messageHistory = new ObservableCollection<Message>();
             this.messageContent = "";
             this.pendingVisibility = "Hidden";
             this.disconnectVisibility = "Hidden";
+            this.restartServerVisibility = "Hidden";
             this.connected = "False";
             this.status = "Listening for connection...";
             this.statusColor = Gray;
 
             networkManager.IsClient += OnIsClient;
             networkManager.CloseClient += OnCloseClient;
+            networkManager.NewEndpoint += OnNewEndpoint;
 
             networkManager.PendingClient += OnPendingClient;
             networkManager.AcceptClient += OnAcceptClient;
             networkManager.DenyClient += OnDenyClient;
 
-            networkManager.MessageRecieved += OnMessageRecieved;
+            networkManager.MessageReceived += OnMessageReceived;
             networkManager.MessageSent += OnMessageSent;
 
             networkManager.Disconnected += OnDisconnected;
@@ -144,8 +172,20 @@ namespace ChatApp.ViewModel
             StatusColor = Red;
             DisconnectVisibility = "Hidden";
             Connected = "False";
+            if (!isClient)
+            {
+                RestartServerVisibility = "Visible";
+            }
         }
 
+        public void StartListener()
+        {
+            Task.Run( () => networkManager.StartServer(IPAddress.Parse(networkManager.IP), int.Parse(networkManager.Port)));
+            Status = "Listening for connection...";
+            StatusColor = Gray;
+            RestartServerVisibility = "Hidden";
+        }
+        
         public void DisconnectChat()
         {
             networkManager.Disconnect();
@@ -171,7 +211,7 @@ namespace ChatApp.ViewModel
 
 
 
-        public void OnMessageRecieved(object? sender, Message message)
+        public void OnMessageReceived(object? sender, Message message)
         {
             userWindow.Dispatcher.Invoke(() =>
             {
@@ -226,6 +266,7 @@ namespace ChatApp.ViewModel
 
         private void OnIsClient(object? sender, EventArgs empty)
         {
+            isClient = true;
             Status = "Waiting for response...";
             StatusColor = Blue;
         }
@@ -236,6 +277,12 @@ namespace ChatApp.ViewModel
             {
                 userWindow.Close();
             });
+        }
+
+        private void OnNewEndpoint(object? sender, EventArgs eventArgs)
+        {
+            IP = networkManager.IP;
+            Port = networkManager.Port;
         }
     }
 }
