@@ -10,24 +10,27 @@
         <viewmodel:ChatScreenViewModel x:Key="m" ></viewmodel:ChatScreenViewModel>
         <DataTemplate x:Key="messageTemplate">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="{Binding Path=Content}"/>
-                <TextBlock Grid.Row="1" Text="{Binding Path=Author}"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Path=Author}" FontWeight="Bold"/>
+                <TextBlock Grid.Column="1" Text=" >  " FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Text="{Binding Path=Content}"/>
             </Grid>
         </DataTemplate>
     </Window.Resources>
-    <Grid>
+    <Grid Background="#FF69B962">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Grid>
+        <Grid Margin="10" Background="white">
             <Grid.RowDefinitions>
                 <RowDefinition/>
-                <RowDefinition Height="50"/>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="25"/>
             </Grid.RowDefinitions>
             <StackPanel Orientation="Vertical">
                 <Button Content="John Doe"/>
@@ -37,18 +40,26 @@
                 <Button Content="June Doe"/>
             </StackPanel>
             <DockPanel Grid.Row="1" Visibility="{Binding Path=Pending}">
-                <Button Width="100" Content="Accept"/>
-                <Button Content="Deny"/>
+                <Button Width="90" Content="Accept" Command="{Binding AcceptRequest}"/>
+                <Button Content="Deny" Command="{Binding DenyRequest}"/>
             </DockPanel>
+            <Border  Grid.Row="2" BorderThickness="1" BorderBrush="Black">
+                <TextBlock Text="{Binding Path=Status}" TextAlignment="Center" Background="{Binding Path=StatusColor}"/>
+            </Border>
         </Grid>
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Margin="0, 10, 10, 10" Background="white">
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*"/>
-                <RowDefinition Height="50"/>
+                <RowDefinition Height="25"/>
             </Grid.RowDefinitions>
-            <ItemsControl Grid.Row="0" 
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" Padding="10">
+            <ItemsControl  
                 ItemsSource="{Binding Path=MessageHistory, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" ItemTemplate="{StaticResource messageTemplate}"/>
-            <Button Grid.Row="1" Command="{Binding SendMessage}" Content="Send"/>
+            </ScrollViewer>
+            <DockPanel Grid.Row="1">
+                <TextBox Width="500" Text="{Binding Path=MessageContent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Command="{Binding SendMessage}" Content="Send"/>
+            </DockPanel>
         </Grid>
     </Grid>
 </Window>

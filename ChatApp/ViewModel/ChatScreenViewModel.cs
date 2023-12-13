@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.RightsManagement;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,11 +16,23 @@ using System.Windows.Input;
 
 namespace ChatApp.ViewModel
 {
+
     class ChatScreenViewModel : INotifyPropertyChanged
     {
+        // Colors
+        const string Gray = "#ddd";
+        const string Red = "#faa";
+        const string Green = "#afa";
+        const string Blue = "#acf";
+
+        // Fields
         private readonly NetworkManager networkManager;
         private ObservableCollection<Message> messageHistory;
+        private string messageContent;
+        private string username;
         private string pending;
+        private string status;
+        private string statusColor;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -30,7 +43,13 @@ namespace ChatApp.ViewModel
             }
         }
 
+        private Window userWindow;
+
+
         private ICommand sendMessage;
+        private ICommand denyRequest;
+        private ICommand acceptRequest;
+
         public ICommand SendMessage
         {
             get
@@ -40,44 +59,134 @@ namespace ChatApp.ViewModel
             }
             set { sendMessage = value; }
         }
+        public ICommand DenyRequest
+        {
+            get
+            {
+                denyRequest ??= new DenyRequestCommand(this);
+                return denyRequest;
+            }
+            set { denyRequest = value; }
+        }
+        public ICommand AcceptRequest
+        {
+            get
+            {
+                acceptRequest ??= new AcceptRequestCommand(this);
+                return acceptRequest;
+            }
+            set { acceptRequest = value; }
+        }
 
         public ObservableCollection<Message> MessageHistory { get { return messageHistory; } }
 
+        public string MessageContent { get { return messageContent; } set { messageContent = value; OnPropertyChanged(); } }
+        public string Username { get { return username; } set { username = value; OnPropertyChanged(); } }
         public string Pending { get { return pending; } set { pending = value; OnPropertyChanged(); } }
+        public string Status { get { return status; } set { status = value; OnPropertyChanged(); } }
+        public string StatusColor { get { return statusColor; } set { statusColor = value; OnPropertyChanged(); } }
 
-        //public ChatScreenViewModel()
-        //{
-        //    this.messageHistory = new ObservableCollection<Message>();
-        //    this.sendMessage = new SendMessageCommand(this);
-        //    this.pending = "Hidden";
+        public ChatScreenViewModel() { }
 
-        //    networkManager.PendingClient += OnPendingClient;
-
-        //}
-
-        public ChatScreenViewModel(ref NetworkManager networkManager)
+        public ChatScreenViewModel(ref NetworkManager networkManager, ChatScreen window)
         {
+            userWindow = window;
             this.networkManager = networkManager;
+            this.username = networkManager.Username;
             this.messageHistory = new ObservableCollection<Message>();
-            this.sendMessage = new SendMessageCommand(this);
             this.pending = "Hidden";
+            this.status = "Listening for connection...";
+            this.statusColor = Gray;
 
+            networkManager.IsClient += OnIsClient;
+            networkManager.CloseClient += OnCloseClient;
 
             networkManager.PendingClient += OnPendingClient;
+            networkManager.AcceptClient += OnAcceptClient;
+            networkManager.DenyClient += OnDenyClient;
+
+            networkManager.MessageRecieved += OnMessageRecieved;
+            networkManager.MessageSent += OnMessageSent;
         }
 
-        public void AddHistory(Message message)
+        public void Send()
         {
-            this.messageHistory.Add(message);
+            networkManager.SendMessage(MessageContent);
+        }
+
+        public void DeclineIncoming()
+        {
+            networkManager.WantConnect = "deny";
+        }
+
+        public void AcceptIncoming()
+        {
+            networkManager.WantConnect = "accept";
+        }
+
+        public void OnMessageRecieved(object? sender, Message message)
+        {
+            userWindow.Dispatcher.Invoke(() =>
+            {
+                messageHistory.Add(message);
+            });
+            OnPropertyChanged(nameof(MessageHistory));
+        }
+
+        public void OnMessageSent(object? sender, Message message)
+        {
+            userWindow.Dispatcher.Invoke(() =>
+            {
+                messageHistory.Add(message);
+            });
+            MessageContent = "";
             System.Diagnostics.Debug.WriteLine($"{message.Content}");
             OnPropertyChanged(nameof(MessageHistory));
         }
 
+
         private void OnPendingClient(object? sender, string user)
         {
             System.Diagnostics.Debug.WriteLine($"{user}");
+            Status = $"{user} wants to connect";
+            StatusColor = Blue;
 
             Pending = "Visible";
+        }
+
+        private void OnAcceptClient(object? sender, string user)
+        {
+            System.Diagnostics.Debug.WriteLine($"{user}");
+
+            Status = $"Chatting with {user}";
+            StatusColor = Green;
+
+            Pending = "Hidden";
+        }
+
+
+        private void OnDenyClient(object? sender, string user)
+        {
+            System.Diagnostics.Debug.WriteLine($"{user}");
+
+            Status = $"Listening for connection...";
+            StatusColor = Gray;
+
+            Pending = "Hidden";
+        }
+
+        private void OnIsClient(object? sender, EventArgs empty)
+        {
+            Status = "Waiting for response...";
+            StatusColor = Blue;
+        }
+
+        private void OnCloseClient(object? sender, EventArgs empty)
+        {
+            userWindow.Dispatcher.Invoke(() =>
+            {
+                userWindow.Close();
+            });
         }
     }
 }

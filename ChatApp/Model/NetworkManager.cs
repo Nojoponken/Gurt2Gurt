@@ -14,27 +14,35 @@ namespace ChatApp.Model
 {
     class NetworkManager
     {
-
-        private IPAddress address;
-        private Int32 port;
+        private string username;
 
         private bool pending;
         private string want_connect;
         private TcpListener server;
+        private TcpClient client;
+
         private NetworkStream stream;
 
+        public event EventHandler? IsClient;
+        public event EventHandler? CloseClient;
+
         public event EventHandler<string>? PendingClient;
+        public event EventHandler<string>? AcceptClient;
+        public event EventHandler<string>? DenyClient;
+
+        public event EventHandler<Message>? MessageRecieved;
+        public event EventHandler<Message>? MessageSent;
 
         public string WantConnect { set { want_connect = value; } }
+        public string Username { get { return username; } }
         public bool Pending { get { return pending; } }
 
-        public NetworkManager(IPAddress address, Int32 port)
+        public NetworkManager(string username)
         {
-            this.address = address;
-            this.port = port;
+            this.username = username;
         }
 
-        public bool StartServer()
+        public bool StartServer(IPAddress address, Int32 port)
         {
 
             this.server = new TcpListener(address, port);
@@ -53,7 +61,7 @@ namespace ChatApp.Model
             {
                 byte[] recieve_buffer = new byte[1024];
                 int data = stream.Read(recieve_buffer, 0, 1024);
-                if (data != null)
+                if (data != 0)
                 {
                     System.Diagnostics.Debug.WriteLine("INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE INVOKE");
 
@@ -65,17 +73,24 @@ namespace ChatApp.Model
                     {
                         if (want_connect == "accept")
                         {
-                            Message response = new("ACCEPT", "John", "system");
+                            Message response = new("ACCEPT", username, "system");
                             string json_string = JsonSerializer.Serialize(response);
-                            // TODO : grabb grej du vet
+                            byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
+                            stream.Write(send_buffer, 0, json_string.Length);
+                            AcceptClient?.Invoke(this, message.Author);
+                            HandleChat();
                             break;
                         }
                         if (want_connect == "deny")
                         {
-                            Message response = new("DENY", "John", "system");
+                            Message response = new("DENY", username, "system");
                             string json_string = JsonSerializer.Serialize(response);
-                            /// TODO: send respsodfa
+                            byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
+                            stream.Write(send_buffer, 0, json_string.Length);
+                            DenyClient?.Invoke(this, message.Author);
                             client.Close();
+                            server.Stop();
+                            StartServer(address, port);
                             break;
                         }
                     }
@@ -87,46 +102,98 @@ namespace ChatApp.Model
 
         public bool StartClient(string adress, Int32 port)
         {
-            using TcpClient client = new(adress, port);
-
+            IsClient?.Invoke(this, EventArgs.Empty);
+            try
+            {
+                client = new TcpClient(adress, port);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"ERROR: {ex.Message}");
+                CloseClient?.Invoke(this, EventArgs.Empty);
+                MessageBox.Show("No server found, try connecting to another port");
+                return false;
+            }
             // Make stream reader/writer
             stream = client.GetStream();
-            
-            Message message = new("REQUEST", "John", "system");
-            string json_string = JsonSerializer.Serialize(message);
 
+            Message message = new("REQUEST", username, "system");
+            string json_string = JsonSerializer.Serialize(message);
 
             byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
             stream.Write(send_buffer, 0, json_string.Length);
-
-
 
             while (true)
             {
                 byte[] recieve_buffer = new byte[1024];
                 int data = stream.Read(recieve_buffer, 0, 1024);
-                if (data != null)
+                if (data != 0)
                 {
                     string response = Encoding.UTF8.GetString(recieve_buffer, 0, data);
+                    System.Diagnostics.Debug.WriteLine($"Found Connection, message: {data}");
+
                     Message response_message = JsonSerializer.Deserialize<Message>(response);
 
-                    System.Diagnostics.Debug.WriteLine($"Found Connection, message: {response}");
                     if (response_message.Type == "system")
                     {
                         if (response_message.Content == "ACCEPT")
                         {
-                            MessageBox.Show("success");
+                            AcceptClient?.Invoke(this, response_message.Author);
+                            HandleChat();
                             return true;
                         }
                         else if (response_message.Content == "DENY")
                         {
                             client.Close();
-                            MessageBox.Show("client off");
+                            CloseClient?.Invoke(this, EventArgs.Empty);
+                            MessageBox.Show("Connection request was denied.");
                             return true;
                         }
                     }
                 }
             }
+        }
+
+        public bool HandleChat()
+        {
+            while (true)
+            {
+                byte[] recieve_buffer = new byte[1024];
+                int data = stream.Read(recieve_buffer, 0, 1024);
+                if (data != 0)
+                {
+                    string message_string = Encoding.UTF8.GetString(recieve_buffer, 0, data);
+
+                    Message message = JsonSerializer.Deserialize<Message>(message_string);
+                    System.Diagnostics.Debug.WriteLine($"New message: {message.Content}");
+
+                    if (message.Type == "user")
+                    {
+                        MessageRecieved?.Invoke(this, message);
+                    }
+                    else if (message.Type == "system" && message.Content == "DISCONNECT")
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public bool SendMessage(string content)
+        {
+            Message message = new(content, username, "user");
+            string json_string = JsonSerializer.Serialize(message);
+
+            byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
+            if (stream != null)
+            {
+                stream.Write(send_buffer, 0, json_string.Length);
+                MessageSent?.Invoke(this, message);
+            }
+
+            return true;
         }
     }
 }

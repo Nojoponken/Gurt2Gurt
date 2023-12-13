@@ -15,6 +15,7 @@ namespace ChatApp.ViewModel.Commands
         public SendMessageCommand(ChatScreenViewModel parent)
         {
             this.parent = parent;
+            //this.author = author;
         }
 
         public event EventHandler? CanExecuteChanged;
@@ -26,7 +27,7 @@ namespace ChatApp.ViewModel.Commands
 
         public void Execute(object? parameter)
         {
-            parent.AddHistory(new Message("In the beninging", "J. Doe", "user"));
+            parent.Send();
         }
     }
 }

@@ -11,14 +11,17 @@
         Grid.IsSharedSizeScope="True"
         VerticalAlignment="Center">
 
+        <TextBlock Text="Gurt2Gurt" TextAlignment="Center" FontSize="36" FontWeight="Bold" FontStyle="Italic" Foreground="White">
+            <TextBlock.Effect>
+                <DropShadowEffect Direction="330" Color="black" ShadowDepth="4"/>
+            </TextBlock.Effect>
+        </TextBlock>
+
         <StackPanel Margin="10">
             <Label Content="Name:" Width="300" Height="30" Foreground="White" FontSize="14" FontFamily="Comic Sans MS" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-            <TextBox Text="{Binding Path=UserName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextWrapping="Wrap" Width="300" Height="30"/>
+            <TextBox Text="{Binding Path=Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextWrapping="Wrap" Width="300" Height="30"/>
         </StackPanel>
 
-        <Label Content="Port:" Width="300" Height="30" Foreground="White" FontSize="14" FontFamily="Comic Sans MS" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-        <TextBox Text="{Binding Path=ListenPort, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" FontSize="14" TextWrapping="Wrap" Width="300" Height="30"/>
-        <Button Command="{Binding StartServer}" Content="Start Server" Width="300" Height="30" Margin="0, 10"/>
 
 
         <StackPanel Orientation="Horizontal" Width="300">
@@ -32,7 +35,8 @@
             </StackPanel>
         </StackPanel>
 
-        <Button Command="{Binding StartClient}" Content="Start Client" Width="300" Height="30" Margin="0, 10, 0, 0"/>
+        <Button Command="{Binding StartServer}" Content="Start Server" Width="300" Height="30" Margin="0, 30, 0, 10"/>
+        <Button Command="{Binding StartClient}" Content="Start Client" Width="300" Height="30"/>
 
     </StackPanel>
 

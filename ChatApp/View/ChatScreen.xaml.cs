@@ -24,7 +24,6 @@ namespace ChatApp.View
         public ChatScreen()
         {
             InitializeComponent();
-
         }
     }
 }

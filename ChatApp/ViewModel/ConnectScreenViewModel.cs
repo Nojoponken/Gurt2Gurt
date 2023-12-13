@@ -20,7 +20,7 @@ namespace ChatApp.ViewModel
 
         private string connectionIP;
         private string connectionPort;
-        private string listenPort;
+        private string username;
 
 
         public ICommand StartServer
@@ -43,26 +43,13 @@ namespace ChatApp.ViewModel
             set { startClient = value; }
         }
 
-        public string ConnectionIP
-        {
-            get { return connectionIP; }
-            set { connectionIP = value; }
-        }
-
-        public string ConnectionPort
-        {
-            get { return connectionPort; }
-            set { connectionPort = value; }
-        }
-        public string ListenPort
-        {
-            get { return listenPort; }
-            set { listenPort = value; }
-        }
+        // Basic getters and setters
+        public string ConnectionIP { get { return connectionIP; } set { connectionIP = value; } }
+        public string ConnectionPort { get { return connectionPort; } set { connectionPort = value; } }
+        public string Username { get { return username; } set { username = value; } }
 
         public ConnectScreenViewModel()
         {
-            this.listenPort = "3000";
             this.connectionIP = "127.0.0.1";
             this.connectionPort = "3000";
 
@@ -73,18 +60,19 @@ namespace ChatApp.ViewModel
         public void StartConnection()
         {
             ChatScreen chatscreen = new();
-            var server = new NetworkManager(IPAddress.Parse("127.0.0.1"), int.Parse(listenPort));
-            Task.Run(() => server.StartServer());
-            chatscreen.DataContext = new ChatScreenViewModel(ref server);
+
+            var server = new NetworkManager(username);
+            Task.Run(() => server.StartServer(IPAddress.Parse("127.0.0.1"), int.Parse(connectionPort)));
+            chatscreen.DataContext = new ChatScreenViewModel(ref server, chatscreen);
             chatscreen.Show();
         }
 
         internal void FindConnection()
         {
             ChatScreen chatscreen = new();
-            var client = new NetworkManager(IPAddress.Parse(connectionIP), int.Parse(connectionPort));
+            var client = new NetworkManager(username);
             Task.Run(() => client.StartClient(connectionIP, int.Parse(connectionPort)));
-            chatscreen.DataContext = new ChatScreenViewModel(ref client);
+            chatscreen.DataContext = new ChatScreenViewModel(ref client, chatscreen);
             chatscreen.Show();
         }
     }
