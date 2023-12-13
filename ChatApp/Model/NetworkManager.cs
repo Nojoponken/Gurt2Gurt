@@ -19,8 +19,8 @@ namespace ChatApp.Model
 
         private bool pending;
         private string want_connect;
-        private TcpListener server;
-        private TcpClient client;
+        private TcpListener? server;
+        private TcpClient? client;
 
         private NetworkStream stream;
 
@@ -42,6 +42,8 @@ namespace ChatApp.Model
         public NetworkManager(string username)
         {
             this.username = username;
+            this.pending = false;
+            this.want_connect = "waiting";
         }
 
         public bool StartServer(IPAddress address, Int32 port)
@@ -161,7 +163,21 @@ namespace ChatApp.Model
             while (true)
             {
                 byte[] recieve_buffer = new byte[1024];
-                int data = stream.Read(recieve_buffer, 0, 1024);
+
+                int data;
+
+                try
+                {
+                    data = stream.Read(recieve_buffer, 0, 1024);
+                }
+                catch (Exception ex)
+                {
+                    client?.Close();
+                    server?.Stop();
+                    Disconnected.Invoke(this, EventArgs.Empty);
+                    return false;
+                }
+                
                 if (data != 0)
                 {
                     string message_string = Encoding.UTF8.GetString(recieve_buffer, 0, data);
@@ -175,8 +191,8 @@ namespace ChatApp.Model
                     }
                     else if (message.Type == "system" && message.Content == "DISCONNECT")
                     {
-                        client.Close();
-                        server.Stop();
+                        client?.Close();
+                        server?.Stop();
                         Disconnected.Invoke(this, EventArgs.Empty);
                         break;
                     }
@@ -207,14 +223,16 @@ namespace ChatApp.Model
             string json_string = JsonSerializer.Serialize(message);
 
             byte[] send_buffer = Encoding.UTF8.GetBytes(json_string);
-            if (stream != null)
-            {
+            try
+            { 
                 stream.Write(send_buffer, 0, json_string.Length);
-                MessageSent?.Invoke(this, message);
+            }
+            catch (Exception ex) { 
+                System.Diagnostics.Debug.WriteLine($"ERROR: {ex}");
             }
 
-            client.Close();
-            server.Stop();
+            client?.Close();
+            server?.Stop();
             Disconnected.Invoke(this, EventArgs.Empty);
 
             return true;

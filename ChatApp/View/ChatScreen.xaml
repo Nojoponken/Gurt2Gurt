@@ -39,7 +39,8 @@
                 <Button Content="Jean Doe"/>
                 <Button Content="June Doe"/>
             </StackPanel>
-            <DockPanel Grid.Row="1" Visibility="{Binding Path=Pending}">
+            <Button Grid.Row="1" Content="Disconnect" Visibility="{Binding DisconnectVisibility}" Command="{Binding Disconnect}"/>
+            <DockPanel Grid.Row="1" Visibility="{Binding Path=PendingVisibility}">
                 <Button Width="90" Content="Accept" Command="{Binding AcceptRequest}"/>
                 <Button Content="Deny" Command="{Binding DenyRequest}"/>
             </DockPanel>
