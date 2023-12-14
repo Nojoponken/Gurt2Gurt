@@ -152,7 +152,17 @@ namespace ChatApp.Model
             while (true)
             {
                 byte[] receiveBuffer = new byte[1024];
-                int data = stream.Read(receiveBuffer, 0, 1024);
+                int data;
+                try
+                {
+                    data = stream.Read(receiveBuffer, 0, 1024);
+                }
+                catch (Exception ex)
+                {
+                    client.Close();
+                    CloseClient?.Invoke(this, EventArgs.Empty);
+                    return false;
+                }
                 if (data != 0)
                 {
                     string response = Encoding.UTF8.GetString(receiveBuffer, 0, data);

@@ -28,7 +28,8 @@ namespace ChatApp.ViewModel
 
         // Fields
         private readonly NetworkManager networkManager;
-        private ObservableCollection<Message> messageHistory;
+        private ObservableCollection<Message> currentConversation;
+        private List<ObservableCollection<Message>> messageHistory;
         private bool isClient;
         private string ip;
         private string port;
@@ -52,7 +53,6 @@ namespace ChatApp.ViewModel
         }
 
         private Window userWindow;
-
 
         private ICommand sendMessage;
         private ICommand denyRequest;
@@ -96,7 +96,7 @@ namespace ChatApp.ViewModel
             }
             set { disconnect = value; }
         }
-        
+
         public ICommand RestartServer
         {
             get
@@ -108,7 +108,8 @@ namespace ChatApp.ViewModel
         }
 
 
-        public ObservableCollection<Message> MessageHistory { get { return messageHistory; } }
+        public ObservableCollection<Message> CurrentConversation { get { return currentConversation; } }
+        public List<ObservableCollection<Message>> MessageHistory { get { return messageHistory; } set { messageHistory = value; OnPropertyChanged(); } }
 
         public string MessageContent { get { return messageContent; } set { messageContent = value; OnPropertyChanged(); } }
         public string Username { get { return username; } set { username = value; OnPropertyChanged(); } }
@@ -134,8 +135,8 @@ namespace ChatApp.ViewModel
             this.username = networkManager.Username;
             this.IP = networkManager.IP;
             this.Port = networkManager.Port;
-            
-            this.messageHistory = new ObservableCollection<Message>();
+
+            this.currentConversation = new ObservableCollection<Message>();
             this.messageContent = "";
             this.pendingVisibility = "Hidden";
             this.disconnectVisibility = "Hidden";
@@ -158,6 +159,12 @@ namespace ChatApp.ViewModel
             networkManager.Disconnected += OnDisconnected;
             userWindow.Closed += OnClosing;
 
+            this.messageHistory = History.LoadHistory();
+            if (messageHistory == null)
+            {
+                this.messageHistory = new List<ObservableCollection<Message>>();
+            }
+            OnPropertyChanged("MessageHistory");
         }
 
         public void OnClosing(object? sender, EventArgs eventArgs)
@@ -168,6 +175,10 @@ namespace ChatApp.ViewModel
 
         public void OnDisconnected(object? sender, EventArgs eventArgs)
         {
+            messageHistory.Add(currentConversation);
+            History.SaveHistory(currentConversation, Username);
+            OnPropertyChanged("MessageHistory");
+
             Status = "Disconnected";
             StatusColor = Red;
             DisconnectVisibility = "Hidden";
@@ -176,16 +187,18 @@ namespace ChatApp.ViewModel
             {
                 RestartServerVisibility = "Visible";
             }
+
+
         }
 
         public void StartListener()
         {
-            Task.Run( () => networkManager.StartServer(IPAddress.Parse(networkManager.IP), int.Parse(networkManager.Port)));
+            Task.Run(() => networkManager.StartServer(IPAddress.Parse(networkManager.IP), int.Parse(networkManager.Port)));
             Status = "Listening for connection...";
             StatusColor = Gray;
             RestartServerVisibility = "Hidden";
         }
-        
+
         public void DisconnectChat()
         {
             networkManager.Disconnect();
@@ -215,20 +228,20 @@ namespace ChatApp.ViewModel
         {
             userWindow.Dispatcher.Invoke(() =>
             {
-                messageHistory.Add(message);
+                currentConversation.Add(message);
             });
-            OnPropertyChanged(nameof(MessageHistory));
+            OnPropertyChanged(nameof(CurrentConversation));
         }
 
         public void OnMessageSent(object? sender, Message message)
         {
             userWindow.Dispatcher.Invoke(() =>
             {
-                messageHistory.Add(message);
+                currentConversation.Add(message);
             });
             MessageContent = "";
             System.Diagnostics.Debug.WriteLine($"{message.Content}");
-            OnPropertyChanged(nameof(MessageHistory));
+            OnPropertyChanged(nameof(CurrentConversation));
         }
 
 
@@ -244,7 +257,10 @@ namespace ChatApp.ViewModel
         private void OnAcceptClient(object? sender, string user)
         {
             System.Diagnostics.Debug.WriteLine($"{user}");
-
+            userWindow.Dispatcher.Invoke(() =>
+            {
+                currentConversation.Clear();
+            });
             Status = $"Chatting with {user}";
             StatusColor = Green;
 
