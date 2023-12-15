@@ -15,93 +15,49 @@ namespace ChatApp.Model
 {
     internal class History
     {
-        //public static List<ObservableCollection<Message>>? sLoadHistory()
-        //{
-        //    string filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        //    string fileName = "myhistory.json";
-        //    // Reads from myhistory.json to messages
-        //    if (File.Exists(filePath))
-        //    {
-        //        string json = File.ReadAllText(Path.Combine(filePath, fileName));
-        //        List<ObservableCollection<Message>> loadedMessages = null;
-        //        try
-        //        {
-        //            loadedMessages = JsonSerializer.Deserialize<List<ObservableCollection<Message>>>(json);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            System.Diagnostics.Debug.WriteLine($"ERROR: {ex.Message}");
-        //        }
-        //        if (loadedMessages != null)
-        //        {
-        //            return loadedMessages.ToList();
-
-        //        }
-        //        return null;
-        //    }
-        //    else
-        //    {
-        //        File.Create(Path.Combine(filePath, fileName));
-        //        return null;
-        //    }
-        //}
-
         public static List<ObservableCollection<Message>> LoadHistory()
         {
-            List<ObservableCollection<Message>> conversations= new();
+            List<ObservableCollection<Message>> conversations = new();
 
-            // Load all conversations
-            string path = Directory.GetCurrentDirectory() + @"\Conversations\";
-            DirectoryInfo dir = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\Conversations\");
-            
-
+            string path = Directory.GetCurrentDirectory() + "/History/";
+            DirectoryInfo directory = new DirectoryInfo(Directory.GetCurrentDirectory() + "/History/");
 
             Directory.CreateDirectory(path);
-            
-            FileInfo[] files = dir.GetFiles("*.JSON");
+
+            FileInfo[] files = directory.GetFiles("*.json");
             foreach (FileInfo file in files)
             {
-                string JSON = File.ReadAllText(path + file.Name);
-                ObservableCollection<Message> c = JsonSerializer.Deserialize<ObservableCollection<Message>>(JSON);
-                conversations.Add(c);
+                string conversationJSON = File.ReadAllText(path + file.Name);
+                ObservableCollection<Message>? conversation = JsonSerializer.Deserialize<ObservableCollection<Message>>(conversationJSON);
+                conversations.Add(conversation);
             }
 
-            // return
             return conversations;
         }
 
         public static void SaveHistory(ObservableCollection<Message> conversation, string filename)
         {
-            DateTime time = DateTime.Now;
-            string dt = time.ToString("s", DateTimeFormatInfo.InvariantInfo);
-
             string jsonString = JsonSerializer.Serialize<ObservableCollection<Message>>(conversation);
-            string path = Directory.GetCurrentDirectory() + @"\Conversations\";
+            string path = Directory.GetCurrentDirectory() + "/History/";
 
-            for (int count = 0; File.Exists(filename); count++)
+            string saveName = path + filename;
+            saveName = saveName.Replace(' ', '_');
+            saveName = saveName.Replace(':', '-');
+            
+            if (File.Exists(saveName + ".json"))
             {
-                filename = filename + count;
+                int count = 2;
+                while (File.Exists(saveName + "_" + count +".json"))
+                {
+                    count++;
+                }
+                saveName = saveName + "_" + count;
             }
 
-            File.WriteAllText(path + filename + ".json", jsonString);
-            //conversation.Messages.Clear(); - handle thread
+            // Avert your eyes
+            tryagain:
+            try { File.WriteAllText(saveName + ".json", jsonString); }
+            catch { goto tryagain; }
         }
-
-
-        //public static void sSaveHistory(List<ObservableCollection<Message>> conversations)
-        //{
-        //    string filePath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        //    string fileName= "myhistory.json";
-        //    // Saves messages to myhistory.json
-        //    string json = JsonSerializer.Serialize(conversations);
-        //    try
-        //    {
-        //        File.WriteAllText(Path.Combine(filePath, fileName), json);
-        //    }
-        //    catch
-        //    {
-        //        SaveHistory(conversations);
-        //    }
-        //}
     }
 }

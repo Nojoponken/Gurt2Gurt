@@ -18,6 +18,7 @@ namespace ChatApp.Model
         private string username;
         private string ip;
         private string port;
+        private string peer;
 
         private bool pending;
         private string wantConnect;
@@ -28,7 +29,7 @@ namespace ChatApp.Model
 
         public event EventHandler? IsClient;
         public event EventHandler? CloseClient;
-        public event EventHandler? Disconnected;
+        public event EventHandler<string>? Disconnected;
         public event EventHandler? NewEndpoint;
 
         public event EventHandler<string>? PendingClient;
@@ -94,17 +95,18 @@ namespace ChatApp.Model
                 {
                     if (wantConnect == "accept")
                     {
-                        Message response = new("ACCEPT", username, "system");
+                        Message response = new("ACCEPT", username, "system", DateTime.Now);
                         string jsonString = JsonSerializer.Serialize(response);
                         byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
                         stream.Write(sendBuffer, 0, jsonString.Length);
                         AcceptClient?.Invoke(this, message.Author);
+                        peer = message.Author;
                         HandleChat();
                         break;
                     }
                     if (wantConnect == "deny")
                     {
-                        Message response = new("DENY", username, "system");
+                        Message response = new("DENY", username, "system", DateTime.Now);
                         string jsonString = JsonSerializer.Serialize(response);
                         byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
                         stream.Write(sendBuffer, 0, jsonString.Length);
@@ -143,7 +145,7 @@ namespace ChatApp.Model
             // Make stream reader/writer
             stream = client.GetStream();
 
-            Message message = new("REQUEST", username, "system");
+            Message message = new("REQUEST", username, "system", DateTime.Now);
             string jsonString = JsonSerializer.Serialize(message);
 
             byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
@@ -175,6 +177,7 @@ namespace ChatApp.Model
                         if (responseMessage.Content == "ACCEPT")
                         {
                             AcceptClient?.Invoke(this, responseMessage.Author);
+                            peer = responseMessage.Author;
                             HandleChat();
                             return true;
                         }
@@ -206,7 +209,6 @@ namespace ChatApp.Model
                 {
                     client?.Close();
                     server?.Stop();
-                    Disconnected.Invoke(this, EventArgs.Empty);
                     return false;
                 }
                 
@@ -215,9 +217,9 @@ namespace ChatApp.Model
                     string messageString = Encoding.UTF8.GetString(receiveBuffer, 0, data);
 
                     Message message = JsonSerializer.Deserialize<Message>(messageString);
-                    System.Diagnostics.Debug.WriteLine($"New message: {message.Content}");
+                    System.Diagnostics.Debug.WriteLine($"New message: {message?.Content}");
 
-                    if (message.Type == "user")
+                    if (message?.Type == "user")
                     {
                         MessageReceived?.Invoke(this, message);
                     }
@@ -225,7 +227,7 @@ namespace ChatApp.Model
                     {
                         client?.Close();
                         server?.Stop();
-                        Disconnected.Invoke(this, EventArgs.Empty);
+                        Disconnected?.Invoke(this, peer);
                         break;
                     }
                 }
@@ -236,7 +238,7 @@ namespace ChatApp.Model
 
         public bool SendMessage(string content)
         {
-            Message message = new(content, username, "user");
+            Message message = new(content, username, "user", DateTime.Now);
             string jsonString = JsonSerializer.Serialize(message);
 
             byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
@@ -251,7 +253,7 @@ namespace ChatApp.Model
 
         public bool Disconnect() 
         {
-            Message message = new("DISCONNECT", username, "system");
+            Message message = new("DISCONNECT", username, "system", DateTime.Now);
             string jsonString = JsonSerializer.Serialize(message);
 
             byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
@@ -265,7 +267,7 @@ namespace ChatApp.Model
 
             client?.Close();
             server?.Stop();
-            Disconnected.Invoke(this, EventArgs.Empty);
+            Disconnected?.Invoke(this, peer);
 
             return true;
         }

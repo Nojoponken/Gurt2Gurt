@@ -173,10 +173,12 @@ namespace ChatApp.ViewModel
             networkManager.Disconnect();
         }
 
-        public void OnDisconnected(object? sender, EventArgs eventArgs)
+        public void OnDisconnected(object? sender, string peer)
         {
+            DateTime dateTime = DateTime.Now;
+            
             messageHistory.Add(currentConversation);
-            History.SaveHistory(currentConversation, Username);
+            History.SaveHistory(currentConversation, Username + "_" + peer + "_" + dateTime.ToString());
             OnPropertyChanged("MessageHistory");
 
             Status = "Disconnected";
