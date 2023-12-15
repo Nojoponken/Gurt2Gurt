@@ -35,8 +35,8 @@
             </StackPanel>
         </StackPanel>
 
-        <Button Command="{Binding StartServer}" Content="Start Server" Width="300" Height="30" Margin="0, 30, 0, 10"/>
-        <Button Command="{Binding StartClient}" Content="Start Client" Width="300" Height="30"/>
+        <Button Command="{Binding StartServer}" IsEnabled="{Binding UsernameExist}" Content="Start Server" Width="300" Height="30" Margin="0, 30, 0, 10"/>
+        <Button Command="{Binding StartClient}" IsEnabled="{Binding UsernameExist}" Content="Start Client" Width="300" Height="30"/>
 
     </StackPanel>
 

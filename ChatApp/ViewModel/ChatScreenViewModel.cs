@@ -29,7 +29,7 @@ namespace ChatApp.ViewModel
         // Fields
         private readonly NetworkManager networkManager;
         private ObservableCollection<Message> currentConversation;
-        private List<ObservableCollection<Message>> messageHistory;
+        private ObservableCollection<Conversation> messageHistory;
         private bool isClient;
         private string ip;
         private string port;
@@ -54,11 +54,22 @@ namespace ChatApp.ViewModel
 
         private Window userWindow;
 
+        private ICommand changeConversation;
         private ICommand sendMessage;
         private ICommand denyRequest;
         private ICommand acceptRequest;
         private ICommand disconnect;
         private ICommand restartServer;
+
+        public ICommand ChangeConversation
+        {
+            get
+            {
+                sendMessage ??= new ChangeConversationCommand(this);
+                return changeConversation;
+            }
+            set { changeConversation = value; }
+        }
 
         public ICommand SendMessage
         {
@@ -108,8 +119,8 @@ namespace ChatApp.ViewModel
         }
 
 
-        public ObservableCollection<Message> CurrentConversation { get { return currentConversation; } }
-        public List<ObservableCollection<Message>> MessageHistory { get { return messageHistory; } set { messageHistory = value; OnPropertyChanged(); } }
+        public ObservableCollection<Message> CurrentConversation { get { return currentConversation; } set { currentConversation = value; OnPropertyChanged(); } }
+        public ObservableCollection<Conversation> MessageHistory { get { return messageHistory; } set { messageHistory = value; OnPropertyChanged(); } }
 
         public string MessageContent { get { return messageContent; } set { messageContent = value; OnPropertyChanged(); } }
         public string Username { get { return username; } set { username = value; OnPropertyChanged(); } }
@@ -162,7 +173,7 @@ namespace ChatApp.ViewModel
             this.messageHistory = History.LoadHistory();
             if (messageHistory == null)
             {
-                this.messageHistory = new List<ObservableCollection<Message>>();
+                this.messageHistory = new ObservableCollection<Conversation>();
             }
             OnPropertyChanged("MessageHistory");
         }
@@ -170,15 +181,16 @@ namespace ChatApp.ViewModel
         public void OnClosing(object? sender, EventArgs eventArgs)
         {
             System.Diagnostics.Debug.WriteLine($"lmao");
-            networkManager.Disconnect();
+            if (networkManager.Connected)
+            {
+                networkManager.Disconnect();
+            }
         }
 
         public void OnDisconnected(object? sender, string peer)
         {
-            DateTime dateTime = DateTime.Now;
-            
-            messageHistory.Add(currentConversation);
-            History.SaveHistory(currentConversation, Username + "_" + peer + "_" + dateTime.ToString());
+            History.SaveHistory(currentConversation, Username, peer);
+            messageHistory = History.LoadHistory();
             OnPropertyChanged("MessageHistory");
 
             Status = "Disconnected";

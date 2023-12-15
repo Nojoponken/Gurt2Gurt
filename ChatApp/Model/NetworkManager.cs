@@ -21,6 +21,7 @@ namespace ChatApp.Model
         private string peer;
 
         private bool pending;
+        private bool connected;
         private string wantConnect;
         private TcpListener? server;
         private TcpClient? client;
@@ -39,6 +40,7 @@ namespace ChatApp.Model
         public event EventHandler<Message>? MessageReceived;
         public event EventHandler<Message>? MessageSent;
 
+        public bool Connected {  get { return connected; } }
         public string WantConnect { set { wantConnect = value; } }
         public string Username { get { return username; } }
         public string IP
@@ -101,6 +103,7 @@ namespace ChatApp.Model
                         stream.Write(sendBuffer, 0, jsonString.Length);
                         AcceptClient?.Invoke(this, message.Author);
                         peer = message.Author;
+                        connected = true;
                         HandleChat();
                         break;
                     }
@@ -178,6 +181,7 @@ namespace ChatApp.Model
                         {
                             AcceptClient?.Invoke(this, responseMessage.Author);
                             peer = responseMessage.Author;
+                            connected = true;
                             HandleChat();
                             return true;
                         }
@@ -225,6 +229,7 @@ namespace ChatApp.Model
                     }
                     else if (message is { Type: "system", Content: "DISCONNECT" })
                     {
+                        connected = false; 
                         client?.Close();
                         server?.Stop();
                         Disconnected?.Invoke(this, peer);
@@ -253,6 +258,7 @@ namespace ChatApp.Model
 
         public bool Disconnect() 
         {
+            connected = false;
             Message message = new("DISCONNECT", username, "system", DateTime.Now);
             string jsonString = JsonSerializer.Serialize(message);
 

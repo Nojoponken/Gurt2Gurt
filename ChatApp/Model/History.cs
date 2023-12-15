@@ -15,9 +15,9 @@ namespace ChatApp.Model
 {
     internal class History
     {
-        public static List<ObservableCollection<Message>> LoadHistory()
+        public static ObservableCollection<Conversation> LoadHistory()
         {
-            List<ObservableCollection<Message>> conversations = new();
+            ObservableCollection<Conversation> conversations = new();
 
             string path = Directory.GetCurrentDirectory() + "/History/";
             DirectoryInfo directory = new DirectoryInfo(Directory.GetCurrentDirectory() + "/History/");
@@ -28,22 +28,29 @@ namespace ChatApp.Model
             foreach (FileInfo file in files)
             {
                 string conversationJSON = File.ReadAllText(path + file.Name);
-                ObservableCollection<Message>? conversation = JsonSerializer.Deserialize<ObservableCollection<Message>>(conversationJSON);
+                Conversation? conversation = JsonSerializer.Deserialize<Conversation>(conversationJSON);
                 conversations.Add(conversation);
             }
 
             return conversations;
         }
 
-        public static void SaveHistory(ObservableCollection<Message> conversation, string filename)
+        public static void SaveHistory(ObservableCollection<Message> messages, string peer1, string peer2)
         {
-            string jsonString = JsonSerializer.Serialize<ObservableCollection<Message>>(conversation);
+            DateTime dateTime = DateTime.Now;
+
+            Conversation conversation = new(peer1, peer2, messages, dateTime);
+            string jsonString = JsonSerializer.Serialize<Conversation>(conversation);
+
+            string filename = peer1 + "_" + peer2 + "_" + dateTime.ToString();
+
             string path = Directory.GetCurrentDirectory() + "/History/";
 
             string saveName = path + filename;
             saveName = saveName.Replace(' ', '_');
             saveName = saveName.Replace(':', '-');
             
+            tryagain:
             if (File.Exists(saveName + ".json"))
             {
                 int count = 2;
@@ -55,7 +62,6 @@ namespace ChatApp.Model
             }
 
             // Avert your eyes
-            tryagain:
             try { File.WriteAllText(saveName + ".json", jsonString); }
             catch { goto tryagain; }
         }

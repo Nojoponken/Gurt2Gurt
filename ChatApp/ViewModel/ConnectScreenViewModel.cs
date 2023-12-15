@@ -3,6 +3,7 @@ using ChatApp.View;
 using ChatApp.ViewModel.Commands;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
@@ -13,7 +14,7 @@ using System.Windows.Input;
 
 namespace ChatApp.ViewModel
 {
-    class ConnectScreenViewModel
+    class ConnectScreenViewModel : INotifyPropertyChanged
     {
         private ICommand startServer;
         private ICommand startClient;
@@ -22,6 +23,14 @@ namespace ChatApp.ViewModel
         private string connectionPort;
         private string username;
 
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
 
         public ICommand StartServer
         {
@@ -46,7 +55,22 @@ namespace ChatApp.ViewModel
         // Basic getters and setters
         public string ConnectionIP { get { return connectionIP; } set { connectionIP = value; } }
         public string ConnectionPort { get { return connectionPort; } set { connectionPort = value; } }
-        public string Username { get { return username; } set { username = value; } }
+        public string Username { get { return username; } set { username = value; OnPropertyChanged("UsernameExist"); } }
+        public string UsernameExist
+        {
+            get
+            {
+                if (username == "" || username == null)
+                {
+                    return "False";
+                }
+                if (username.Any(c => "<>:\"/\\|?*".Contains(c)))
+                {
+                    return "False";
+                }
+                return "True";
+            }
+        }
 
         public ConnectScreenViewModel()
         {
