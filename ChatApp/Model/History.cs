@@ -54,7 +54,9 @@ namespace ChatApp.Model
             string path = Directory.GetCurrentDirectory() + @"\Conversations\";
             DirectoryInfo dir = new DirectoryInfo(Directory.GetCurrentDirectory() + @"\Conversations\");
             
-            //File.Create(path);
+
+
+            Directory.CreateDirectory(path);
             
             FileInfo[] files = dir.GetFiles("*.JSON");
             foreach (FileInfo file in files)
