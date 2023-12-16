@@ -74,6 +74,7 @@ namespace ChatApp.ViewModel
 
         public ConnectScreenViewModel()
         {
+            this.username = "";
             this.connectionIP = "127.0.0.1";
             this.connectionPort = "3000";
 

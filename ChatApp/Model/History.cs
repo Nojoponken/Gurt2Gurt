@@ -29,20 +29,22 @@ namespace ChatApp.Model
             {
                 string conversationJSON = File.ReadAllText(path + file.Name);
                 Conversation? conversation = JsonSerializer.Deserialize<Conversation>(conversationJSON);
-                conversations.Add(conversation);
+                if (conversation != null)
+                {
+                    conversations.Add(conversation);
+                }
             }
+
+            conversations = new ObservableCollection<Conversation>( conversations.OrderByDescending(c => c.Date));
 
             return conversations;
         }
 
-        public static void SaveHistory(ObservableCollection<Message> messages, string peer1, string peer2)
+        public static void SaveHistory(Conversation conversation)
         {
-            DateTime dateTime = DateTime.Now;
-
-            Conversation conversation = new(peer1, peer2, messages, dateTime);
             string jsonString = JsonSerializer.Serialize<Conversation>(conversation);
 
-            string filename = peer1 + "_" + peer2 + "_" + dateTime.ToString();
+            string filename = conversation.Peer1 + "_" + conversation.Peer2 + "_" + conversation.Date.ToString();
 
             string path = Directory.GetCurrentDirectory() + "/History/";
 
