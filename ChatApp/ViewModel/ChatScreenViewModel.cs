@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Media;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Security.RightsManagement;
@@ -42,6 +43,8 @@ namespace ChatApp.ViewModel
         private string statusColor;
         private string connected;
 
+        private string searchQuery;
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -54,11 +57,22 @@ namespace ChatApp.ViewModel
 
         private Window userWindow;
 
+        private ICommand? buzz;
         private ICommand? sendMessage;
         private ICommand? denyRequest;
         private ICommand? acceptRequest;
         private ICommand? disconnect;
         private ICommand? restartServer;
+
+        public ICommand? Buzz
+        {
+            get
+            {
+                buzz ??= new BuzzCommand(this);
+                return buzz;
+            }
+            set { buzz = value; }
+        }
 
         public ICommand? SendMessage
         {
@@ -109,7 +123,7 @@ namespace ChatApp.ViewModel
 
 
         public Conversation CurrentConversation { get { return currentConversation; } set { currentConversation = value; OnPropertyChanged(); } }
-        public ObservableCollection<Conversation> MessageHistory { get { return messageHistory; } set { messageHistory = value; OnPropertyChanged(); } }
+        public ObservableCollection<Conversation> MessageHistory { get { return new ObservableCollection<Conversation>(messageHistory.Where(i => i.Peer2.Contains(SearchQuery)).ToList()); } set { messageHistory = value; OnPropertyChanged(); } }
 
         public string? Username { get { return username; } set { username = value; OnPropertyChanged(); } }
         public string? IP { get { return ip; } set { ip = value; OnPropertyChanged(); } }
@@ -119,6 +133,7 @@ namespace ChatApp.ViewModel
         public string DisconnectVisibility { get { return disconnectVisibility; } set { disconnectVisibility = value; OnPropertyChanged(); } }
         public string RestartServerVisibility { get { return restartServerVisibility; } set { restartServerVisibility = value; OnPropertyChanged(); } }
 
+        public string SearchQuery { get { return searchQuery; } set { searchQuery = value; OnPropertyChanged(); OnPropertyChanged(nameof(MessageHistory)); } }
         public string Status { get { return status; } set { status = value; OnPropertyChanged(); } }
         public string StatusColor { get { return statusColor; } set { statusColor = value; OnPropertyChanged(); } }
         public string Connected { get { return connected; } set { connected = value; OnPropertyChanged(); OnPropertyChanged(nameof(Disconnected)); } }
@@ -128,7 +143,7 @@ namespace ChatApp.ViewModel
             {
                 if (connected == "True")
                 { return "False"; }
-                else 
+                else
                 { return "True"; }
             }
         }
@@ -145,6 +160,7 @@ namespace ChatApp.ViewModel
             this.IP = networkManager.IP;
             this.Port = networkManager.Port;
 
+            this.searchQuery = "";
             this.messageContent = "";
             this.pendingVisibility = "Hidden";
             this.disconnectVisibility = "Hidden";
@@ -163,6 +179,7 @@ namespace ChatApp.ViewModel
 
             networkManager.MessageReceived += OnMessageReceived;
             networkManager.MessageSent += OnMessageSent;
+            networkManager.Buzzed += OnBuzzed;
 
             networkManager.Disconnected += OnDisconnected;
             userWindow.Closed += OnClosing;
@@ -173,6 +190,24 @@ namespace ChatApp.ViewModel
                 this.messageHistory = new ObservableCollection<Conversation>();
             }
             OnPropertyChanged("MessageHistory");
+        }
+
+        private void OnBuzzed(object? sender, EventArgs eventArgs)
+        {
+            userWindow.Dispatcher.Invoke(() =>
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    for (int j = 0; j < 20; j++)
+                    {
+                    userWindow.Left = userWindow.Left - 1.0;
+                    }
+                    for (int j = 0; j < 20; j++)
+                    {
+                        userWindow.Left = userWindow.Left + 1.0;
+                    }
+                }
+            });
         }
 
         public void OnClosing(object? sender, EventArgs eventArgs)
@@ -319,10 +354,9 @@ namespace ChatApp.ViewModel
             Port = networkManager.Port;
         }
 
-        internal void Change()
+        internal void SendBuzz()
         {
-            userWindow.Dispatcher.Invoke(() =>
-            System.Diagnostics.Debug.WriteLine("fjskdfjskjflsjkfjfdljfslkjk"));
+            networkManager.SendBuzz();
         }
     }
 }

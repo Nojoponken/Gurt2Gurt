@@ -31,6 +31,7 @@ namespace ChatApp.Model
         public event EventHandler? IsClient;
         public event EventHandler? CloseClient;
         public event EventHandler<string>? Disconnected;
+        public event EventHandler? Buzzed;
         public event EventHandler? NewEndpoint;
 
         public event EventHandler<string>? PendingClient;
@@ -238,6 +239,10 @@ namespace ChatApp.Model
                         Disconnected?.Invoke(this, peer);
                         break;
                     }
+                    else if (message is { Type: "system", Content:"BUZZ"})
+                    {
+                        Buzzed?.Invoke(this, EventArgs.Empty);
+                    }
                 }
             }
 
@@ -258,6 +263,21 @@ namespace ChatApp.Model
 
             return true;
         }
+
+        public bool SendBuzz()
+        {
+            Message message = new("BUZZ", username, "system", DateTime.Now);
+            string jsonString = JsonSerializer.Serialize(message);
+
+            byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
+            if (stream != null)
+            {
+                stream.Write(sendBuffer, 0, jsonString.Length);
+            }
+
+            return true;
+        }
+
 
         public bool Disconnect()
         {
