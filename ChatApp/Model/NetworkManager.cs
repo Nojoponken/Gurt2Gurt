@@ -26,7 +26,7 @@ namespace ChatApp.Model
 
         // -- Constructors ----------- //
         public event EventHandler? IsClient;
-        public event EventHandler? CloseClient;
+        public event EventHandler<string>? CloseClient;
         public event EventHandler<string>? Disconnected;
         public event EventHandler? Buzzed;
         public event EventHandler? NewEndpoint;
@@ -66,15 +66,10 @@ namespace ChatApp.Model
 
             server = new TcpListener(address, port);
             server.Start();
-            System.Diagnostics.Debug.WriteLine("Starting a connection...");
 
             wantConnect = "waiting";
 
             client = server.AcceptTcpClient();
-            System.Diagnostics.Debug.WriteLine("Connection established!");
-
-
-
             stream = client.GetStream();
             while (true)
             {
@@ -109,9 +104,8 @@ namespace ChatApp.Model
                         byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
                         stream.Write(sendBuffer, 0, jsonString.Length);
                         DenyClient?.Invoke(this, message.Author);
-                        client.Close();
-                        server.Stop();
                         StartServer(address, port);
+                        Cleanup();
                         break;
                     }
                 }
@@ -136,8 +130,7 @@ namespace ChatApp.Model
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"ERROR: {ex.Message}");
-                CloseClient?.Invoke(this, EventArgs.Empty);
-                MessageBox.Show("No server found, try connecting to another port");
+                CloseClient?.Invoke(this, "No server found, try connecting to another port");
                 return false;
             }
             // Make stream reader/writer
@@ -159,15 +152,14 @@ namespace ChatApp.Model
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"ERROR: {ex}");
+                    System.Diagnostics.Debug.WriteLine($"ERROR: {ex.Message}");
                     client.Close();
-                    CloseClient?.Invoke(this, EventArgs.Empty);
+                    CloseClient?.Invoke(this, "No response");
                     return false;
                 }
                 if (data != 0)
                 {
                     string response = Encoding.UTF8.GetString(receiveBuffer, 0, data);
-                    System.Diagnostics.Debug.WriteLine($"Found Connection, message: {data}");
 
                     Message? responseMessage = JsonSerializer.Deserialize<Message>(response);
 
@@ -185,8 +177,7 @@ namespace ChatApp.Model
                         else if (responseMessage.Content == "DENY")
                         {
                             client.Close();
-                            CloseClient?.Invoke(this, EventArgs.Empty);
-                            MessageBox.Show("Connection request was denied.");
+                            CloseClient?.Invoke(this, "Connection request was denied.");
                             return true;
                         }
                     }
@@ -204,8 +195,7 @@ namespace ChatApp.Model
 
                 if (!stream.CanRead)
                 {
-                    client?.Close();
-                    server?.Stop();
+                    Cleanup();
                     return false;
                 }
 
@@ -216,7 +206,6 @@ namespace ChatApp.Model
                     string messageString = Encoding.UTF8.GetString(receiveBuffer, 0, data);
 
                     Message? message = JsonSerializer.Deserialize<Message>(messageString);
-                    System.Diagnostics.Debug.WriteLine($"New message: {message?.Content}");
 
                     if (message?.Type == "user")
                     {
@@ -224,9 +213,7 @@ namespace ChatApp.Model
                     }
                     else if (message is { Type: "system", Content: "DISCONNECT" })
                     {
-                        connected = false;
-                        client?.Close();
-                        server?.Stop();
+                        Cleanup();
                         if (peer == null) peer = "";
                         Disconnected?.Invoke(this, peer);
                         break;
@@ -272,20 +259,25 @@ namespace ChatApp.Model
 
         public bool Disconnect()
         {
-            connected = false;
             Message message = new("DISCONNECT", username, "system", DateTime.Now);
             string jsonString = JsonSerializer.Serialize(message);
 
             byte[] sendBuffer = Encoding.UTF8.GetBytes(jsonString);
-
             stream?.Write(sendBuffer, 0, jsonString.Length);
 
-            client?.Close();
-            server?.Stop();
+            Cleanup();
             if (peer == null) peer = "";
             Disconnected?.Invoke(this, peer);
 
             return true;
+        }
+
+        private void Cleanup()
+        {
+            connected = false;
+            client?.Close();
+            server?.Stop();
+            stream = null;
         }
         // --------------------------- //
     }

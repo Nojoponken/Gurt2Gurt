@@ -271,7 +271,6 @@ namespace ChatApp.ViewModel
 
         private void OnPendingClient(object? sender, string user)
         {
-            System.Diagnostics.Debug.WriteLine($"{user}");
             Status = $"{user} wants to connect";
             StatusColor = Blue;
 
@@ -280,7 +279,6 @@ namespace ChatApp.ViewModel
 
         private void OnAcceptClient(object? sender, string user)
         {
-            System.Diagnostics.Debug.WriteLine($"{user}");
             userWindow.Dispatcher.Invoke(() =>
             {
                 CurrentConversation = new Conversation(Username, user, new ObservableCollection<Message>(), DateTime.Now);
@@ -296,8 +294,6 @@ namespace ChatApp.ViewModel
 
         private void OnDenyClient(object? sender, string user)
         {
-            System.Diagnostics.Debug.WriteLine($"{user}");
-
             Status = $"Listening for connection...";
             StatusColor = Gray;
 
@@ -320,7 +316,6 @@ namespace ChatApp.ViewModel
                 currentConversation.Messages.Add(message);
             });
             MessageContent = "";
-            System.Diagnostics.Debug.WriteLine($"{message.Content}");
             OnPropertyChanged(nameof(CurrentConversation));
         }
 
@@ -350,17 +345,14 @@ namespace ChatApp.ViewModel
             Port = networkManager.Port;
         }
 
-        private void OnCloseClient(object? sender, EventArgs eventArgs)
+        private void OnCloseClient(object? sender, string message)
         {
-            userWindow.Dispatcher.Invoke(() =>
-            {
-                userWindow.Close();
-            });
+            Status = $"Disconnected: {message}";
+            StatusColor = Red;
         }
 
         public void OnClosing(object? sender, EventArgs eventArgs)
         {
-            System.Diagnostics.Debug.WriteLine($"lmao");
             if (networkManager.Connected)
             {
                 networkManager.Disconnect();
