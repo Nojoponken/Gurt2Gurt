@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Globalization;
 using System.Text.Json;
-using System.IO;
-using System.Reflection.Metadata;
 
 namespace ChatApp.Model
 {
     class NetworkManager
     {
+        // -- Fields ----------------- //
         private string username;
         private string? ip;
         private string? port;
@@ -27,7 +22,9 @@ namespace ChatApp.Model
         private TcpClient? client;
 
         private NetworkStream? stream;
+        // --------------------------- //
 
+        // -- Constructors ----------- //
         public event EventHandler? IsClient;
         public event EventHandler? CloseClient;
         public event EventHandler<string>? Disconnected;
@@ -40,32 +37,27 @@ namespace ChatApp.Model
 
         public event EventHandler<Message>? MessageReceived;
         public event EventHandler<Message>? MessageSent;
+        // --------------------------- //
 
+        // -- Properties --------------------------------------- //
         public bool Connected { get { return connected; } }
         public string WantConnect { set { wantConnect = value; } }
         public string Username { get { return username; } }
-        public string? IP
-        {
-            get { return ip; }
-        }
+        public string? IP { get { return ip; } }
+        public string? Port { get { return port; } }
+        public bool Pending { get { return pending; } }
+        // ----------------------------------------------------- //
 
-        public string? Port
-        {
-            get { return port; }
-        }
-
-        public bool Pending
-        {
-            get { return pending; }
-        }
-
+        // -- Constructors ----------- //
         public NetworkManager(string username)
         {
             this.username = username;
             this.pending = false;
             this.wantConnect = "waiting";
         }
+        // --------------------------- //
 
+        // -- Methods ---------------- //
         public bool StartServer(IPAddress address, int port)
         {
             this.port = port.ToString();
@@ -239,7 +231,7 @@ namespace ChatApp.Model
                         Disconnected?.Invoke(this, peer);
                         break;
                     }
-                    else if (message is { Type: "system", Content:"BUZZ"})
+                    else if (message is { Type: "system", Content: "BUZZ" })
                     {
                         Buzzed?.Invoke(this, EventArgs.Empty);
                     }
@@ -278,7 +270,6 @@ namespace ChatApp.Model
             return true;
         }
 
-
         public bool Disconnect()
         {
             connected = false;
@@ -296,5 +287,6 @@ namespace ChatApp.Model
 
             return true;
         }
+        // --------------------------- //
     }
 }

@@ -1,28 +1,25 @@
 ﻿using ChatApp.Model;
 using ChatApp.View;
 using ChatApp.ViewModel.Commands;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace ChatApp.ViewModel
 {
     class ConnectScreenViewModel : INotifyPropertyChanged
     {
-        private ICommand startServer;
-        private ICommand startClient;
 
-        private string connectionIP;
-        private string connectionPort;
+        // -- Fields ----------------- //
         private string username;
+        private string ip;
+        private string port;
+        // --------------------------- //
 
+        // -- INotifyPropertyChanged implementation -------------------------------- //
         public event PropertyChangedEventHandler? PropertyChanged;
         private void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -31,6 +28,11 @@ namespace ChatApp.ViewModel
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+        // ------------------------------------------------------------------------- //
+
+        // -- ICommands -------------- //
+        private ICommand startServer;
+        private ICommand startClient;
 
         public ICommand StartServer
         {
@@ -51,10 +53,11 @@ namespace ChatApp.ViewModel
             }
             set { startClient = value; }
         }
+        // --------------------------- //
 
-        // Basic getters and setters
-        public string ConnectionIP { get { return connectionIP; } set { connectionIP = value; } }
-        public string ConnectionPort { get { return connectionPort; } set { connectionPort = value; } }
+        // -- Properties ----------------------------------------------------------- //
+        public string ConnectionIP { get { return ip; } set { ip = value; } }
+        public string ConnectionPort { get { return port; } set { port = value; } }
         public string Username { get { return username; } set { username = value; OnPropertyChanged("UsernameExist"); } }
         public string UsernameExist
         {
@@ -71,23 +74,27 @@ namespace ChatApp.ViewModel
                 return "True";
             }
         }
+        // ------------------------------------------------------------------------- //
 
+        // -- Constructors ----------- //
         public ConnectScreenViewModel()
         {
             this.username = "";
-            this.connectionIP = "127.0.0.1";
-            this.connectionPort = "3000";
+            this.ip = "127.0.0.1";
+            this.port = "3000";
 
             this.startServer = new StartServerCommand(this);
             this.startClient = new StartClientCommand(this);
         }
+        // --------------------------- //
 
+        // -- Methods ---------------- //
         public void StartConnection()
         {
             ChatScreen chatscreen = new();
 
             var server = new NetworkManager(username);
-            Task.Run(() => server.StartServer(IPAddress.Parse("127.0.0.1"), int.Parse(connectionPort)));
+            Task.Run(() => server.StartServer(IPAddress.Parse("127.0.0.1"), int.Parse(port)));
             chatscreen.DataContext = new ChatScreenViewModel(ref server, chatscreen);
             chatscreen.Show();
         }
@@ -96,9 +103,10 @@ namespace ChatApp.ViewModel
         {
             ChatScreen chatscreen = new();
             var client = new NetworkManager(username);
-            Task.Run(() => client.StartClient(connectionIP, int.Parse(connectionPort)));
+            Task.Run(() => client.StartClient(ip, int.Parse(port)));
             chatscreen.DataContext = new ChatScreenViewModel(ref client, chatscreen);
             chatscreen.Show();
         }
+        // ------------------------- //
     }
 }
